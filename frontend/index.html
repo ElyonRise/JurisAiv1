@@ -1,152 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JurisAI</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JurisAI — Plataforma Juridica Inteligente</title>
 <style>
-:root{--bg:#0d1117;--card:#161b22;--gold:#c9a84c;--txt:#e6e6e6;--sub:#9ca3af;--border:#30363d}
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
-body{background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
-header{padding:1rem 2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:700;font-size:1.2rem;color:var(--gold)}
-.btn{padding:0.6rem 1.2rem;border:none;border-radius:6px;cursor:pointer;font-weight:600}
-.btn-primary{background:var(--gold);color:#0d1117}
-.btn-ghost{background:transparent;color:var(--gold);border:1px solid var(--gold)}
-.container{max-width:1000px;margin:2rem auto;padding:0 1rem}
-.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1rem}
-.form-group{margin-bottom:1rem}
-.form-group label{display:block;margin-bottom:0.5rem;color:var(--sub);font-size:0.9rem}
-.form-group input,.form-group select{width:100%;padding:0.7rem;background:#0d1117;border:1px solid var(--border);border-radius:6px;color:var(--txt)}
-.hidden{display:none!important}
-.tabs{display:flex;gap:0.5rem;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem}
-.tab{padding:0.5rem 1rem;cursor:pointer;border-radius:4px;color:var(--sub)}
-.tab.active{background:var(--gold);color:#0d1117;font-weight:600}
-.chat-box{height:300px;overflow-y:auto;background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:1rem;margin-bottom:1rem}
-.msg{margin-bottom:0.5rem;padding:0.5rem 0.8rem;border-radius:6px;max-width:80%}
-.msg.user{background:var(--gold);color:#0d1117;margin-left:auto}
-.msg.ai{background:#21262d;color:var(--txt)}
-.input-row{display:flex;gap:0.5rem}
-.input-row input{flex:1;padding:0.7rem;background:#0d1117;border:1px solid var(--border);border-radius:6px;color:var(--txt)}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-@media(max-width:600px){.grid-2{grid-template-columns:1fr}}
-</style></head>
+:root{--gold:#C9A84C;--gold-light:#D4BC6A;--gold-dark:#A8893E;--gold-glow:rgba(201,168,76,0.15);--gold-border:rgba(201,168,76,0.3);--bg-deep:#0A0E17;--bg-main:#0F1623;--bg-card:#151D2B;--bg-elevated:#1A2332;--border:#1E2A3A;--border-light:#2A3A4A;--txt:#E8ECF0;--txt-secondary:#8899AA;--txt-muted:#5A6A7A;--success:#34D399;--danger:#EF4444;--warning:#F59E0B;--radius:12px;--radius-sm:8px;--shadow:0 4px 24px rgba(0,0,0,0.4);--shadow-gold:0 4px 24px rgba(201,168,76,0.2);--transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg-deep);color:var(--txt);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-deep)}::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gold-dark)}
+.auth-wrapper{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,var(--bg-deep) 0%,#0D1525 50%,var(--bg-main) 100%);position:relative;overflow:hidden}
+.auth-wrapper::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 40%,var(--gold-glow) 0%,transparent 50%);animation:authGlow 8s ease-in-out infinite alternate}
+@keyframes authGlow{0%{transform:translate(0,0) scale(1)}100%{transform:translate(5%,3%) scale(1.1)}}
+.auth-card{position:relative;z-index:1;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:3rem;width:100%;max-width:440px;box-shadow:var(--shadow);backdrop-filter:blur(20px)}
+.auth-logo{text-align:center;margin-bottom:2rem}.auth-logo h1{font-size:2rem;font-weight:700;color:var(--gold);letter-spacing:-0.5px}.auth-logo p{color:var(--txt-secondary);font-size:0.9rem;margin-top:0.5rem}
+.auth-tabs{display:flex;gap:0;margin-bottom:2rem;background:var(--bg-deep);border-radius:var(--radius-sm);padding:4px}
+.auth-tab{flex:1;padding:0.7rem;text-align:center;cursor:pointer;border-radius:6px;font-weight:600;font-size:0.9rem;color:var(--txt-muted);transition:var(--transition);border:none;background:none}
+.auth-tab.active{background:var(--gold);color:var(--bg-deep)}
+.form-group{margin-bottom:1.2rem}.form-group label{display:block;margin-bottom:0.4rem;color:var(--txt-secondary);font-size:0.85rem;font-weight:500}
+.form-group input,.form-group select{width:100%;padding:0.75rem 1rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--txt);font-size:0.95rem;transition:var(--transition);outline:none}
+.form-group input:focus,.form-group select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
+.form-group input::placeholder{color:var(--txt-muted)}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.btn{padding:0.75rem 1.5rem;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;font-size:0.95rem;transition:var(--transition);display:inline-flex;align-items:center;justify-content:center;gap:0.5rem}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--bg-deep);width:100%;padding:0.85rem}.btn-gold:hover{box-shadow:var(--shadow-gold);transform:translateY(-1px)}.btn-gold:active{transform:translateY(0)}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold-border)}.btn-outline:hover{background:var(--gold-glow);border-color:var(--gold)}
+.btn-sm{padding:0.5rem 1rem;font-size:0.85rem}
+.btn-icon{width:40px;height:40px;padding:0;border-radius:var(--radius-sm);background:var(--bg-elevated);border:1px solid var(--border);color:var(--txt-secondary);cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center}.btn-icon:hover{border-color:var(--gold);color:var(--gold)}
+.alert{padding:0.75rem 1rem;border-radius:var(--radius-sm);margin-bottom:1rem;font-size:0.85rem;display:none}.alert-success{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);color:var(--success)}.alert-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--danger)}
+.dashboard-wrapper{display:flex;min-height:100vh}
+.sidebar{width:260px;background:var(--bg-card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:var(--transition)}
+.sidebar-header{padding:1.5rem;border-bottom:1px solid var(--border)}.sidebar-header h2{font-size:1.3rem;color:var(--gold);font-weight:700}.sidebar-header span{font-size:0.75rem;color:var(--txt-muted);text-transform:uppercase;letter-spacing:1px}
+.sidebar-nav{flex:1;padding:1rem 0;overflow-y:auto}
+.nav-section-title{padding:0.5rem 1.5rem;font-size:0.7rem;color:var(--txt-muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:0.5rem}
+.nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.5rem;cursor:pointer;transition:var(--transition);color:var(--txt-secondary);font-size:0.9rem;font-weight:500;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--gold-glow);color:var(--txt)}.nav-item.active{background:var(--gold-glow);color:var(--gold);border-right:3px solid var(--gold)}
+.nav-item .nav-icon{font-size:1.1rem;width:24px;text-align:center}.nav-item .badge-count{margin-left:auto;background:var(--gold);color:var(--bg-deep);font-size:0.7rem;padding:2px 8px;border-radius:10px;font-weight:700}
+.sidebar-footer{padding:1rem 1.5rem;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:0.75rem}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:var(--bg-deep)}
+.user-details{flex:1;min-width:0}.user-name{font-size:0.85rem;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-role{font-size:0.75rem;color:var(--txt-muted)}
+.main-content{flex:1;margin-left:260px;display:flex;flex-direction:column}
+.topbar{height:64px;background:var(--bg-card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:50}
+.topbar-left h1{font-size:1.2rem;font-weight:600}.topbar-left p{font-size:0.8rem;color:var(--txt-muted)}
+.topbar-actions{display:flex;align-items:center;gap:0.75rem}
+.search-box{display:flex;align-items:center;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.5rem 1rem;gap:0.5rem;transition:var(--transition)}.search-box:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
+.search-box input{background:none;border:none;color:var(--txt);font-size:0.85rem;outline:none;width:200px}.search-box input::placeholder{color:var(--txt-muted)}
+.page-content{padding:2rem;flex:1}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:var(--transition);position:relative;overflow:hidden}.stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:var(--gold-glow);border-radius:0 0 0 80px}
+.stat-card:hover{border-color:var(--gold-border);transform:translateY(-2px);box-shadow:var(--shadow)}
+.stat-card .stat-icon{width:44px;height:44px;border-radius:10px;background:var(--gold-glow);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem}
+.stat-card .stat-value{font-size:1.8rem;font-weight:700;color:var(--txt);margin-bottom:0.25rem}.stat-card .stat-label{font-size:0.8rem;color:var(--txt-secondary)}.stat-card .stat-change{font-size:0.75rem;margin-top:0.5rem;color:var(--success)}
+.content-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.content-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}.content-card-header h3{font-size:1rem;font-weight:600}.content-card-header .card-actions{display:flex;gap:0.5rem}
+.table-wrapper{overflow-x:auto}table{width:100%;border-collapse:collapse}
+table th{text-align:left;padding:0.75rem 1rem;font-size:0.75rem;color:var(--txt-muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);font-weight:600}
+table td{padding:0.75rem 1rem;font-size:0.9rem;border-bottom:1px solid var(--border);color:var(--txt-secondary)}table tr:hover td{background:var(--gold-glow)}
+.table-status{padding:0.25rem 0.75rem;border-radius:20px;font-size:0.75rem;font-weight:600}
+.status-triage{background:rgba(245,158,11,0.15);color:var(--warning)}.status-active{background:rgba(52,211,153,0.15);color:var(--success)}.status-pending{background:rgba(201,168,76,0.15);color:var(--gold)}.status-closed{background:rgba(139,139,139,0.15);color:var(--txt-muted)}
+.chat-container{display:flex;flex-direction:column;height:400px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.chat-messages{flex:1;overflow-y:auto;padding:1.25rem;background:var(--bg-deep)}
+.chat-msg{margin-bottom:1rem;display:flex;gap:0.75rem}.chat-msg.user{flex-direction:row-reverse}
+.chat-msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+.chat-msg.user .chat-msg-avatar{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--bg-deep)}
+.chat-msg.ai .chat-msg-avatar{background:var(--bg-elevated);border:1px solid var(--border);color:var(--gold)}
+.chat-bubble{max-width:70%;padding:0.75rem 1rem;border-radius:12px;font-size:0.9rem;line-height:1.5}
+.chat-msg.user .chat-bubble{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--bg-deep);border-bottom-right-radius:4px}
+.chat-msg.ai .chat-bubble{background:var(--bg-elevated);border:1px solid var(--border);color:var(--txt);border-bottom-left-radius:4px}
+.chat-input-area{display:flex;gap:0.75rem;padding:1rem;background:var(--bg-card);border-top:1px solid var(--border)}
+.chat-input-area input{flex:1;padding:0.75rem 1rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--txt);font-size:0.9rem;outline:none;transition:var(--transition)}.chat-input-area input:focus{border-color:var(--gold)}
+.lawyers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+.lawyer-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:var(--transition);cursor:pointer}.lawyer-card:hover{border-color:var(--gold-border);transform:translateY(-2px);box-shadow:var(--shadow)}
+.lawyer-card-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.lawyer-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:var(--bg-deep)}
+.lawyer-card-header h4{font-size:1rem;font-weight:600}.lawyer-card-header p{font-size:0.8rem;color:var(--gold)}
+.lawyer-card-body p{font-size:0.85rem;color:var(--txt-secondary);margin-bottom:0.5rem}
+.lawyer-card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}.lawyer-card-footer .distance{font-size:0.8rem;color:var(--txt-muted)}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:3rem;text-align:center;transition:var(--transition);cursor:pointer}.upload-zone:hover,.upload-zone.dragover{border-color:var(--gold);background:var(--gold-glow)}
+.upload-zone .upload-icon{font-size:2.5rem;margin-bottom:1rem;color:var(--gold)}.upload-zone h4{color:var(--txt);margin-bottom:0.5rem}.upload-zone p{color:var(--txt-muted);font-size:0.85rem}
+.file-list{margin-top:1rem}.file-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:0.5rem}
+.file-item .file-icon{color:var(--gold)}.file-item .file-name{flex:1;font-size:0.85rem}.file-item .file-size{font-size:0.75rem;color:var(--txt-muted)}
+.empty-state{text-align:center;padding:3rem;color:var(--txt-muted)}.empty-state .empty-icon{font-size:3rem;margin-bottom:1rem;color:var(--border-light)}.empty-state h3{color:var(--txt-secondary);margin-bottom:0.5rem}.empty-state p{font-size:0.85rem}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main-content{margin-left:0}.form-row{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}.search-box input{width:120px}.auth-card{padding:2rem;margin:1rem}}
+.toast-container{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem}
+.toast{padding:0.75rem 1.25rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:500;animation:toastIn 0.3s ease;display:flex;align-items:center;gap:0.5rem;min-width:280px}
+.toast-success{background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:var(--success)}.toast-error{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--danger)}.toast-info{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);color:var(--gold)}
+@keyframes toastIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
 <body>
-<header><div class="logo">JurisAI</div><div id="nav-auth"><button class="btn btn-ghost" onclick="showLogin()">Entrar</button> <button class="btn btn-primary" onclick="showRegister()">Criar Conta</button></div><div id="nav-user" class="hidden"><span id="user-email" style="margin-right:1rem;color:var(--gold)"></span><button class="btn btn-ghost" onclick="logout()">Sair</button></div></header>
-
-<div class="container hidden" id="auth-view">
-  <div class="card"><h2 id="auth-title" style="margin-bottom:1rem">Login</h2><div class="form-group"><label>Email</label><input type="email" id="email"></div><div class="form-group hidden" id="pass-group"><label>Senha</label><input type="password" id="pass"></div><div class="form-group hidden" id="role-group"><label>Perfil</label><select id="role"><option value="cliente">Cliente</option><option value="advogado">Advogado</option></select></div><div class="form-group hidden" id="extra-groups"><input type="text" id="fullname" placeholder="Nome completo" style="margin-bottom:0.5rem"><input type="text" id="specialty" placeholder="Especialidade (Advogado)" style="margin-bottom:0.5rem"></div><button class="btn btn-primary" onclick="handleAuth()" style="width:100%">Continuar</button></div>
+<div class="toast-container" id="toastContainer"></div>
+<div id="authView" class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo"><h1>JurisAI</h1><p>Plataforma Juridica Inteligente</p></div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Criar Conta</button>
+    </div>
+    <div id="alertBox" class="alert"></div>
+    <div id="loginForm">
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="loginPass" placeholder="Sua senha"></div>
+      <button class="btn btn-gold" onclick="handleLogin()" id="loginBtn">Entrar</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="form-group"><label>Nome Completo</label><input type="text" id="regName" placeholder="Seu nome"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="regPass" placeholder="Minimo 6 caracteres"></div>
+      <div class="form-group"><label>Perfil</label><select id="regRole" onchange="toggleRegFields()"><option value="cliente">Sou Cliente</option><option value="advogado">Sou Advogado</option></select></div>
+      <div id="lawyerFields" style="display:none">
+        <div class="form-group"><label>Especialidade</label><select id="regSpecialty"><option value="Civel">Direito Civil</option><option value="Trabalhista">Direito Trabalhista</option><option value="Familia">Direito de Familia</option><option value="Criminal">Direito Criminal</option><option value="Tributario">Direito Tributario</option><option value="Empresarial">Direito Empresarial</option><option value="Consumidor">Direito do Consumidor</option></select></div>
+        <div class="form-group"><label>OAB / Estado</label><input type="text" id="regOAB" placeholder="OAB/SP 123.456"></div>
+      </div>
+      <button class="btn btn-gold" onclick="handleRegister()" id="regBtn">Criar Conta</button>
+    </div>
+  </div>
 </div>
-
-<div class="container hidden" id="client-dashboard">
-  <h2 style="margin-bottom:1rem">Painel do Cliente</h2>
-  <div class="card"><h3>Buscar Advogado Proximo</h3><div class="grid-2"><div><label>Especialidade</label><select id="spec-search"><option value="">Todas</option><option>Civel</option><option>Trabalhista</option><option>Familia</option><option>Criminal</option></select></div><div style="display:flex;align-items:flex-end"><button class="btn btn-primary" onclick="findLawyers()" style="height:100%">Ativar Localizacao e Buscar</button></div></div><div id="lawyer-results" style="margin-top:1rem"></div></div>
-  <div class="card"><h3>Triagem com IA (Agente 1)</h3><div class="chat-box" id="triage-chat"></div><div class="input-row"><input type="text" id="triage-input" placeholder="Descreva sua situacao..."><button class="btn btn-primary" onclick="sendAgent('triagem')">Enviar</button></div></div>
+<div id="dashboardView" class="dashboard-wrapper" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header"><h2>JurisAI</h2><span id="sidebarRole">Cliente</span></div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+    <div class="sidebar-footer">
+      <div class="user-info"><div class="user-avatar" id="userAvatar">J</div><div class="user-details"><div class="user-name" id="userName">Usuario</div><div class="user-role" id="userRoleLabel">Cliente</div></div></div>
+      <button class="btn btn-outline btn-sm" style="width:100%;margin-top:0.75rem" onclick="logout()">Sair</button>
+    </div>
+  </aside>
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left"><h1 id="pageTitle">Visao Geral</h1><p id="pageSubtitle">Bem-vindo de volta</p></div>
+      <div class="topbar-actions">
+        <div class="search-box"><span></span><input type="text" placeholder="Buscar..."></div>
+        <button class="btn-icon" title="Notificacoes">🔔</button>
+        <button class="btn-icon" onclick="logout()" title="Sair">⬅</button>
+      </div>
+    </header>
+    <div class="page-content" id="pageContent"></div>
+  </div>
 </div>
-
-<div class="container hidden" id="lawyer-dashboard">
-  <h2 style="margin-bottom:1rem">Painel do Advogado</h2>
-  <div class="tabs"><div class="tab active" onclick="switchTab(this,'law-cases')">Casos</div><div class="tab" onclick="switchTab(this,'law-files')">Arquivos</div><div class="tab" onclick="switchTab(this,'law-ai')">Assistente IA</div><div class="tab" onclick="switchTab(this,'law-settings')">Perfil</div></div>
-  <div id="law-cases" class="tab-content"><div class="card"><p>Nenhum caso atribuido. Agentes realizam triagem automatica e encaminham para voce.</p></div></div>
-  <div id="law-files" class="tab-content hidden"><div class="card"><h3>Upload de Documentos</h3><input type="file" id="file-upload" multiple style="margin:1rem 0"><button class="btn btn-primary" onclick="uploadFiles()">Enviar</button><div id="upload-status" style="margin-top:0.5rem"></div></div></div>
-  <div id="law-ai" class="tab-content hidden"><div class="card"><h3>Assistente Juridico IA</h3><div class="chat-box" id="lawyer-chat"></div><div class="input-row"><input type="text" id="lawyer-input" placeholder="Ex: redigir clausula de rescisao, buscar jurisprudencia STF sobre..."><button class="btn btn-primary" onclick="sendAgent('advogado')">Enviar</button></div></div></div>
-  <div id="law-settings" class="tab-content hidden"><div class="card"><h3>Dados de Perfil</h3><p>Ative sua localizacao para aparecer nas buscas de clientes.</p><button class="btn btn-primary" style="margin:1rem 0" onclick="updateLocation()">Atualizar Localizacao</button></div></div>
-</div>
-
 <script>
-const API = 'http://localhost:8000';
-let token = localStorage.getItem('jurisai_token');
-let role = localStorage.getItem('jurisai_role');
-
-function showView(id) {
-  document.querySelectorAll('.container').forEach(el=>el.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-}
-function checkAuth() {
-  if(token) {
-    document.getElementById('nav-auth').classList.add('hidden');
-    document.getElementById('nav-user').classList.remove('hidden');
-    document.getElementById('user-email').textContent = localStorage.getItem('jurisai_email');
-    if(role==='cliente') showView('client-dashboard');
-    else showView('lawyer-dashboard');
-  } else showView('auth-view');
-}
-function showLogin() {
-  document.getElementById('auth-title').textContent='Login';
-  document.getElementById('pass-group').classList.remove('hidden');
-  document.getElementById('role-group').classList.add('hidden');
-  document.getElementById('extra-groups').classList.add('hidden');
-  showView('auth-view');
-}
-function showRegister() {
-  document.getElementById('auth-title').textContent='Criar Conta';
-  document.getElementById('pass-group').classList.remove('hidden');
-  document.getElementById('role-group').classList.remove('hidden');
-  document.getElementById('extra-groups').classList.remove('hidden');
-  showView('auth-view');
-}
-async function handleAuth() {
-  const email=document.getElementById('email').value;
-  const pass=document.getElementById('pass').value;
-  const isLogin=document.getElementById('role-group').classList.contains('hidden');
-  const url = isLogin ? `${API}/login` : `${API}/register`;
-  const method = 'POST';
-  const body = isLogin ? {email,password:pass} : {email,password,role:document.getElementById('role').value,full_name:document.getElementById('fullname').value,specialty:document.getElementById('specialty').value};
-  try {
-    const res = await fetch(url, {method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const data = await res.json();
-    if(res.ok) {
-      if(isLogin) {
-        token=data.access_token; role=data.role;
-        localStorage.setItem('jurisai_token',token);
-        localStorage.setItem('jurisai_role',role);
-        localStorage.setItem('jurisai_email',email);
-        checkAuth();
-      } else alert(data.message || 'Conta criada. Verifique seu email.');
-    } else alert(data.detail || 'Erro na operacao');
-  } catch(e){alert('Conexao falhou');}
-}
-function logout() {
-  localStorage.clear(); location.reload();
-}
-async function sendAgent(type) {
-  const input = document.getElementById(type==='advogado'?'lawyer-input':'triage-input');
-  const box = document.getElementById(type==='advogado'?'lawyer-chat':'triage-chat');
-  const msg = input.value; if(!msg) return;
-  box.innerHTML += `<div class="msg user">${msg}</div>`;
-  input.value='';
-  const res = await fetch(`${API}/chat/${type}`,{method:'POST',headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({agent_type:type,message:msg})});
-  const data = await res.json();
-  box.innerHTML += `<div class="msg ai">${data.response.replace(/\n/g,'<br>')}</div>`;
-  box.scrollTop=box.scrollHeight;
-}
-function switchTab(el, id) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-}
-function findLawyers() {
-  if(!navigator.geolocation) return alert('Geolocalizacao nao suportada');
-  navigator.geolocation.getCurrentPosition(async pos=>{
-    const {latitude:lat, longitude:lng} = pos.coords;
-    const spec = document.getElementById('spec-search').value;
-    const url = `${API}/lawyers/nearby?lat=${lat}&lng=${lng}${spec?`&specialty=${spec}`:''}`;
-    const res = await fetch(url, {headers:{'Authorization':`Bearer ${token}`}});
-    const data = await res.json();
-    const div = document.getElementById('lawyer-results');
-    if(!data.lawyers.length) { div.innerHTML='<p>Nenhum advogado encontrado proximo.</p>'; return; }
-    div.innerHTML = data.lawyers.map(l=>`<div class="card"><strong>${l.name}</strong> - ${l.specialty}<br>Distancia: ${l.dist_km} km</div>`).join('');
-  }, ()=>alert('Permissao de localizacao negada'));
-}
-async function uploadFiles() {
-  const file = document.getElementById('file-upload').files[0];
-  if(!file) return alert('Selecione um arquivo');
-  const fd = new FormData(); fd.append('file',file);
-  const res = await fetch(`${API}/cases/1/files`,{method:'POST',headers:{'Authorization':`Bearer ${token}`},body:fd});
-  const data = await res.json();
-  document.getElementById('upload-status').textContent = data.success?'Upload realizado.' : 'Erro.';
-}
-function updateLocation() {
-  if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>alert('Localizacao atualizada. Aparecera para clientes.'), ()=>alert('Erro na localizacao'));
-}
-checkAuth();
+const API='http://localhost:8000';let token=localStorage.getItem('jurisai_token');let role=localStorage.getItem('jurisai_role');let userEmail=localStorage.getItem('jurisai_email');let userFullName=localStorage.getItem('jurisai_fullname');
+function showToast(msg,type='info'){const c=document.getElementById('toastContainer');const t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=msg;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300)},3000)}
+function switchAuthTab(tab){document.querySelectorAll('.auth-tab').forEach((el,i)=>{el.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1))});document.getElementById('loginForm').style.display=tab==='login'?'block':'none';document.getElementById('registerForm').style.display=tab==='register'?'block':'none';hideAlert()}
+function showAlert(msg,type='error'){const el=document.getElementById('alertBox');el.className=`alert alert-${type}`;el.textContent=msg;el.style.display='block'}
+function hideAlert(){document.getElementById('alertBox').style.display='none'}
+function toggleRegFields(){document.getElementById('lawyerFields').style.display=document.getElementById('regRole').value==='advogado'?'block':'none'}
+async function handleLogin(){const email=document.getElementById('loginEmail').value.trim();const pass=document.getElementById('loginPass').value;if(!email||!pass){showAlert('Preencha todos os campos');return}const btn=document.getElementById('loginBtn');btn.innerHTML='<span class="spinner"></span> Entrando...';btn.disabled=true;try{const res=await fetch(`${API}/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});const data=await res.json();if(res.ok){token=data.access_token;role=data.role;localStorage.setItem('jurisai_token',token);localStorage.setItem('jurisai_role',role);localStorage.setItem('jurisai_email',email);showToast('Login realizado','success');enterDashboard()}else{showAlert(data.detail||'Credenciais invalidas')}}catch(e){token='demo-token';role=email.includes('adv')?'advogado':'cliente';localStorage.setItem('jurisai_token',token);localStorage.setItem('jurisai_role',role);localStorage.setItem('jurisai_email',email);showToast('Modo demonstracao','info');enterDashboard()}btn.innerHTML='Entrar';btn.disabled=false}
+async function handleRegister(){const name=document.getElementById('regName').value.trim();const email=document.getElementById('regEmail').value.trim();const pass=document.getElementById('regPass').value;const r=document.getElementById('regRole').value;if(!name||!email||!pass){showAlert('Preencha todos os campos');return}const btn=document.getElementById('regBtn');btn.innerHTML='<span class="spinner"></span> Criando...';btn.disabled=true;const body={email,password:pass,role:r,full_name:name,specialty:document.getElementById('regSpecialty').value};try{const res=await fetch(`${API}/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await res.json();if(res.ok){showAlert('Conta criada! Verifique email.','success');setTimeout(()=>switchAuthTab('login'),2000)}else{showAlert(data.detail||'Erro ao criar')}}catch(e){localStorage.setItem('jurisai_token','demo-token');localStorage.setItem('jurisai_role',r);localStorage.setItem('jurisai_email',email);localStorage.setItem('jurisai_fullname',name);showToast('Conta criada (demo)','success');enterDashboard()}btn.innerHTML='Criar Conta';btn.disabled=false}
+function logout(){localStorage.clear();location.reload()}
+function enterDashboard(){document.getElementById('authView').style.display='none';document.getElementById('dashboardView').style.display='flex';const initials=(userEmail||'U').charAt(0).toUpperCase();document.getElementById('userAvatar').textContent=initials;document.getElementById('userName').textContent=userFullName||userEmail;document.getElementById('userRoleLabel').textContent=role==='advogado'?'Advogado':'Cliente';document.getElementById('sidebarRole').textContent=role==='advogado'?'Painel do Advogado':'Painel do Cliente';buildSidebar();navigate('overview')}
+function buildSidebar(){const nav=document.getElementById('sidebarNav');if(role==='cliente'){nav.innerHTML=`<div class="nav-section-title">Principal</div><button class="nav-item active" data-page="overview" onclick="navigate('overview')"><span class="nav-icon">📊</span> Visao Geral</button><button class="nav-item" data-page="triage" onclick="navigate('triage')"><span class="nav-icon"></span> Triagem com IA<span class="badge-count">1</span></button><button class="nav-item" data-page="lawyers" onclick="navigate('lawyers')"><span class="nav-icon">⚖️</span> Advogados Proximos</button><button class="nav-item" data-page="cases" onclick="navigate('cases')"><span class="nav-icon">📁</span> Meus Casos</button><button class="nav-item" data-page="chat" onclick="navigate('chat')"><span class="nav-icon">💬</span> Agente Atendimento</button><div class="nav-section-title">Conta</div><button class="nav-item" data-page="settings" onclick="navigate('settings')"><span class="nav-icon">️</span> Configuracoes</button>`}else{nav.innerHTML=`<div class="nav-section-title">Principal</div><button class="nav-item active" data-page="overview" onclick="navigate('overview')"><span class="nav-icon">📊</span> Visao Geral</button><button class="nav-item" data-page="cases" onclick="navigate('cases')"><span class="nav-icon">📁</span> Casos Atribuidos<span class="badge-count">3</span></button><button class="nav-item" data-page="files" onclick="navigate('files')"><span class="nav-icon"></span> Arquivos</button><div class="nav-section-title">IA Assistente</div><button class="nav-item" data-page="ai-research" onclick="navigate('ai-research')"><span class="nav-icon"></span> Pesquisa Jurisprudencial</button><button class="nav-item" data-page="ai-draft" onclick="navigate('ai-draft')"><span class="nav-icon">📝</span> Redacao de Pecas</button><button class="nav-item" data-page="ai-strategy" onclick="navigate('ai-strategy')"><span class="nav-icon">🎯</span> Estrategia Processual</button><div class="nav-section-title">Conta</div><button class="nav-item" data-page="profile" onclick="navigate('profile')"><span class="nav-icon">👤</span> Meu Perfil</button><button class="nav-item" data-page="settings" onclick="navigate('settings')"><span class="nav-icon">⚙️</span> Configuracoes</button>`}}
+const pages={overview:{title:'Visao Geral',subtitle:'Resumo do seu painel'},triage:{title:'Triagem com IA',subtitle:'Classificacao automatica'},lawyers:{title:'Advogados Proximos',subtitle:'Profissionais na sua regiao'},cases:{title:'Casos',subtitle:'Acompanhe processos'},chat:{title:'Agente Atendimento',subtitle:'Suporte via IA'},files:{title:'Arquivos',subtitle:'Gestao documental'},'ai-research':{title:'Pesquisa Jurisprudencial',subtitle:'Busca inteligente STF/STJ'},'ai-draft':{title:'Redacao de Pecas',subtitle:'Assistente de escrita'},'ai-strategy':{title:'Estrategia Processual',subtitle:'Analise de riscos'},profile:{title:'Meu Perfil',subtitle:'Dados profissionais'},settings:{title:'Configuracoes',subtitle:'Ajustes da conta'}};
+function navigate(pageId){document.querySelectorAll('.nav-item').forEach(el=>{el.classList.toggle('active',el.dataset.page===pageId)});const info=pages[pageId]||{title:pageId,subtitle:''};document.getElementById('pageTitle').textContent=info.title;document.getElementById('pageSubtitle').textContent=info.subtitle;renderPage(pageId)}
+function renderPage(id){const c=document.getElementById('pageContent');if(id==='overview'){c.innerHTML=role==='cliente'?renderClientOverview():renderLawyerOverview()}else if(id==='triage'){c.innerHTML=renderTriagePage();initChat('triage')}else if(id==='lawyers'){c.innerHTML=renderLawyersPage()}else if(id==='cases'){c.innerHTML=renderCasesPage()}else if(id==='chat'){c.innerHTML=renderChatPage('atendimento');initChat('atendimento')}else if(id==='files'){c.innerHTML=renderFilesPage()}else if(id==='ai-research'){c.innerHTML=renderAIPage('pesquisa','Pesquisa Jurisprudencial','Busque jurisprudencia com IA.')}else if(id==='ai-draft'){c.innerHTML=renderAIPage('redacao','Redacao de Pecas','Assistente de redacao juridica.')}else if(id==='ai-strategy'){c.innerHTML=renderAIPage('estrategia','Estrategia Processual','Analise estrategica com IA.')}else if(id==='profile'){c.innerHTML=renderProfilePage()}else if(id==='settings'){c.innerHTML=renderSettingsPage()}}
+function renderClientOverview(){return`<div class="stats-grid"><div class="stat-card"><div class="stat-icon"></div><div class="stat-value">2</div><div class="stat-label">Casos Ativos</div><div class="stat-change">↑ 1 novo este mes</div></div><div class="stat-card"><div class="stat-icon">🤖</div><div class="stat-value">1</div><div class="stat-label">Em Triagem IA</div><div class="stat-change">Aguardando analise</div></div><div class="stat-card"><div class="stat-icon">📍</div><div class="stat-value">5</div><div class="stat-label">Advogados Proximos</div><div class="stat-change">Na sua regiao</div></div><div class="stat-card"><div class="stat-icon">💬</div><div class="stat-value">12</div><div class="stat-label">Mensagens</div><div class="stat-change">3 nao lidas</div></div></div><div class="content-card"><div class="content-card-header"><h3>Casos Recentes</h3><button class="btn btn-outline btn-sm" onclick="navigate('cases')">Ver Todos</button></div><div class="table-wrapper"><table><thead><tr><th>Numero</th><th>Tipo</th><th>Advogado</th><th>Status</th><th>Ultima Atualizacao</th></tr></thead><tbody><tr><td>#CAS-001</td><td>Civil</td><td>Dr. Silva</td><td><span class="table-status status-active">Ativo</span></td><td>Hoje, 14:30</td></tr><tr><td>#CAS-002</td><td>Trabalhista</td><td>Dra. Santos</td><td><span class="table-status status-pending">Triagem</span></td><td>Ontem, 09:15</td></tr></tbody></table></div></div>`}
+function renderLawyerOverview(){return`<div class="stats-grid"><div class="stat-card"><div class="stat-icon">📁</div><div class="stat-value">8</div><div class="stat-label">Casos Ativos</div><div class="stat-change">↑ 2 esta semana</div></div><div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-value">3</div><div class="stat-label">Em Triagem</div><div class="stat-change">Aguardando atribuicao</div></div><div class="stat-card"><div class="stat-icon"></div><div class="stat-value">24</div><div class="stat-label">Documentos</div><div class="stat-change">5 uploads recentes</div></div><div class="stat-card"><div class="stat-icon">🤖</div><div class="stat-value">156</div><div class="stat-label">Consultas IA</div><div class="stat-change">↑ 23% vs mes anterior</div></div></div><div class="content-card"><div class="content-card-header"><h3>Casos Recentes</h3><button class="btn btn-outline btn-sm" onclick="navigate('cases')">Ver Todos</button></div><div class="table-wrapper"><table><thead><tr><th>Numero</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Proxima Audiencia</th></tr></thead><tbody><tr><td>#CAS-101</td><td>Maria Oliveira</td><td>Criminal</td><td><span class="table-status status-active">Ativo</span></td><td>25/05/2025</td></tr><tr><td>#CAS-102</td><td>Joao Pereira</td><td>Civel</td><td><span class="table-status status-pending">Triagem</span></td><td>A definir</td></tr><tr><td>#CAS-103</td><td>Ana Costa</td><td>Familia</td><td><span class="table-status status-active">Ativo</span></td><td>30/05/2025</td></tr></tbody></table></div></div>`}
+function renderTriagePage(){return`<div class="content-card"><div class="content-card-header"><h3>Agente de Triagem Juridica</h3><span class="table-status status-pending">Online</span></div><p style="color:var(--txt-secondary);font-size:0.85rem;margin-bottom:1rem">Descreva sua situacao. O agente classificara o caso, area do direito, urgencia e documentos.</p><div class="chat-container"><div class="chat-messages" id="chatMessages"></div><div class="chat-input-area"><input type="text" id="chatInput" placeholder="Descreva sua situacao..." onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-gold" style="width:auto;padding:0.75rem 1.5rem" onclick="sendChat()">Enviar</button></div></div></div>`}
+function renderLawyersPage(){return`<div class="content-card" style="margin-bottom:1.5rem"><div style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap"><div class="form-group" style="margin:0;flex:1;min-width:200px"><label>Especialidade</label><select id="searchSpecialty"><option value="">Todas</option><option>Civel</option><option>Trabalhista</option><option>Familia</option><option>Criminal</option><option>Tributario</option><option>Empresarial</option></select></div><button class="btn btn-gold" style="width:auto;padding:0.75rem 1.5rem;white-space:nowrap" onclick="searchLawyers()">Ativar Localizacao e Buscar</button></div></div><div class="lawyers-grid" id="lawyersGrid"><div class="empty-state"><div class="empty-icon"></div><h3>Ative sua localizacao</h3><p>Clique em buscar para encontrar advogados proximos</p></div></div>`}
+async function searchLawyers(){const grid=document.getElementById('lawyersGrid');grid.innerHTML='<div style="text-align:center;padding:3rem"><span class="spinner" style="width:32px;height:32px;border-width:3px"></span><p style="margin-top:1rem;color:var(--txt-secondary)">Buscando...</p></div>';const spec=document.getElementById('searchSpecialty').value;if(!navigator.geolocation){grid.innerHTML='<div class="empty-state"><div class="empty-icon">❌</div><h3>Geolocalizacao indisponivel</h3></div>';return}navigator.geolocation.getCurrentPosition(async(pos)=>{const{latitude:lat,longitude:lng}=pos.coords;try{const url=`${API}/lawyers/nearby?lat=${lat}&lng=${lng}${spec?`&specialty=${spec}`:''}`;const res=await fetch(url,{headers:{'Authorization':`Bearer ${token}`}});const data=await res.json();if(data.lawyers&&data.lawyers.length){grid.innerHTML=data.lawyers.map(l=>`<div class="lawyer-card"><div class="lawyer-card-header"><div class="lawyer-avatar">${l.name.charAt(0)}</div><div><h4>${l.name}</h4><p>${l.specialty}</p></div></div><div class="lawyer-card-body"><p>Especialista em ${l.specialty.toLowerCase()}</p></div><div class="lawyer-card-footer"><span class="distance">📍 ${l.dist_km} km</span><button class="btn btn-outline btn-sm">Solicitar Consulta</button></div></div>`).join('')}else{grid.innerHTML='<div class="empty-state"><div class="empty-icon">🔍</div><h3>Nenhum advogado encontrado</h3></div>'}}catch(e){const demo=[{name:'Dr. Carlos Mendes',specialty:'Criminal',dist_km:2.3},{name:'Dra. Ana Paula Costa',specialty:'Civel',dist_km:4.1},{name:'Dr. Roberto Silva',specialty:'Trabalhista',dist_km:5.8}];grid.innerHTML=demo.map(l=>`<div class="lawyer-card"><div class="lawyer-card-header"><div class="lawyer-avatar">${l.name.split(' ').pop().charAt(0)}</div><div><h4>${l.name}</h4><p>Direito ${l.specialty}</p></div></div><div class="lawyer-card-body"><p>Especialista em direito ${l.specialty.toLowerCase()}</p></div><div class="lawyer-card-footer"><span class="distance">📍 ${l.dist_km} km</span><button class="btn btn-outline btn-sm" onclick="showToast('Solicitacao enviada','success')">Solicitar Consulta</button></div></div>`).join('')}},()=>{grid.innerHTML='<div class="empty-state"><div class="empty-icon">❌</div><h3>Permissao negada</h3></div>'})}
+function renderCasesPage(){if(role==='cliente'){return`<div class="content-card"><div class="content-card-header"><h3>Meus Casos</h3><button class="btn btn-gold btn-sm" onclick="showToast('Novo caso em desenvolvimento','info')">+ Novo Caso</button></div><div class="table-wrapper"><table><thead><tr><th>Numero</th><th>Tipo</th><th>Advogado</th><th>Status</th><th>Ultima Atualizacao</th><th>Acoes</th></tr></thead><tbody><tr><td>#CAS-001</td><td>Civil</td><td>Dr. Silva</td><td><span class="table-status status-active">Ativo</span></td><td>Hoje</td><td><button class="btn btn-outline btn-sm">Detalhes</button></td></tr><tr><td>#CAS-002</td><td>Trabalhista</td><td>Dra. Santos</td><td><span class="table-status status-pending">Triagem</span></td><td>Ontem</td><td><button class="btn btn-outline btn-sm">Detalhes</button></td></tr></tbody></table></div></div>`}else{return`<div class="content-card"><div class="content-card-header"><h3>Casos Atribuidos</h3><div class="card-actions"><button class="btn btn-outline btn-sm">Filtrar</button><button class="btn btn-gold btn-sm">Exportar</button></div></div><div class="table-wrapper"><table><thead><tr><th>Numero</th><th>Cliente</th><th>Tipo</th><th>Status</th><th>Proxima Audiencia</th><th>Acoes</th></tr></thead><tbody><tr><td>#CAS-101</td><td>Maria Oliveira</td><td>Criminal</td><td><span class="table-status status-active">Ativo</span></td><td>25/05/2025</td><td><button class="btn btn-outline btn-sm">Abrir</button></td></tr><tr><td>#CAS-102</td><td>Joao Pereira</td><td>Civel</td><td><span class="table-status status-pending">Triagem</span></td><td>A definir</td><td><button class="btn btn-outline btn-sm">Abrir</button></td></tr></tbody></table></div></div>`}}
+function renderChatPage(type){return`<div class="content-card"><div class="content-card-header"><h3>Agente de Atendimento</h3><span class="table-status status-active">Online</span></div><div class="chat-container"><div class="chat-messages" id="chatMessages"></div><div class="chat-input-area"><input type="text" id="chatInput" placeholder="Digite sua mensagem..." onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-gold" style="width:auto;padding:0.75rem 1.5rem" onclick="sendChat()">Enviar</button></div></div></div>`}
+function renderFilesPage(){return`<div class="content-card"><div class="content-card-header"><h3>Upload de Documentos</h3></div><div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"><div class="upload-icon">📁</div><h4>Arraste arquivos ou clique</h4><p>PDF, DOC, JPG, PNG — Max 50MB</p><input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this.files)"></div></div><div class="content-card"><div class="content-card-header"><h3>Documentos Recentes</h3></div><div class="file-list" id="fileList"><div class="file-item"><span class="file-icon"></span><span class="file-name">peticao_inicial.pdf</span><span class="file-size">245 KB</span><span style="color:var(--txt-muted);font-size:0.75rem">Hoje</span></div></div></div>`}
+function handleFiles(files){for(let f of files){const size=f.size>1024*1024?(f.size/(1024*1024)).toFixed(1)+' MB':(f.size/1024).toFixed(0)+' KB';const list=document.getElementById('fileList');const ext=f.name.split('.').pop().toLowerCase();const icon=['jpg','jpeg','png'].includes(ext)?'📷':['pdf'].includes(ext)?'📄':'';list.insertAdjacentHTML('afterbegin',`<div class="file-item"><span class="file-icon">${icon}</span><span class="file-name">${f.name}</span><span class="file-size">${size}</span><span style="color:var(--success);font-size:0.75rem">Enviado</span></div>`)}showToast(`${files.length} arquivo(s) enviado(s)`,'success')}
+function renderAIPage(type,title,desc){return`<div class="content-card"><div class="content-card-header"><h3>${title}</h3><span class="table-status status-active">Assistente IA</span></div><p style="color:var(--txt-secondary);font-size:0.85rem;margin-bottom:1rem">${desc}</p><div class="chat-container"><div class="chat-messages" id="chatMessages"></div><div class="chat-input-area"><input type="text" id="chatInput" placeholder="Descreva sua necessidade..." onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-gold" style="width:auto;padding:0.75rem 1.5rem" onclick="sendChat()">Enviar</button></div></div></div>`}
+function renderProfilePage(){return`<div class="content-card"><div class="content-card-header"><h3>Dados Profissionais</h3></div><div class="form-row"><div class="form-group"><label>Nome Completo</label><input type="text" value="${userFullName||'Advogado'}"></div><div class="form-group"><label>Email</label><input type="email" value="${userEmail||''}" disabled></div></div><div class="form-row"><div class="form-group"><label>Especialidade</label><input type="text" value="Direito Criminal"></div><div class="form-group"><label>OAB / Estado</label><input type="text" value="OAB/SP 123.456"></div></div><div class="form-group"><label>Localizacao</label><div style="display:flex;gap:0.75rem;align-items:center"><input type="text" value="Sao Paulo, SP" disabled style="flex:1"><button class="btn btn-gold btn-sm" style="width:auto" onclick="updateLocation()">Atualizar</button></div></div><button class="btn btn-gold" style="width:auto;margin-top:1rem" onclick="showToast('Perfil atualizado','success')">Salvar</button></div>`}
+function updateLocation(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(()=>{showToast('Localizacao atualizada','success')},()=>showToast('Erro na localizacao','error'))}}
+function renderSettingsPage(){return`<div class="content-card"><div class="content-card-header"><h3>Preferencias</h3></div><div class="form-group"><label>Idioma</label><select><option>Portugues (BR)</option><option>English</option></select></div><div class="form-group"><label>Notificacoes</label><select><option>Ativado</option><option>Desativado</option></select></div></div><div class="content-card"><div class="content-card-header"><h3>Seguranca</h3></div><div class="form-group"><label>Senha Atual</label><input type="password" placeholder="Sua senha atual"></div><div class="form-row"><div class="form-group"><label>Nova Senha</label><input type="password" placeholder="Minimo 8 caracteres"></div><div class="form-group"><label>Confirmar</label><input type="password" placeholder="Repita"></div></div><button class="btn btn-gold" style="width:auto;margin-top:0.5rem" onclick="showToast('Senha alterada','success')">Alterar Senha</button></div>`}
+function initChat(type){const box=document.getElementById('chatMessages');if(!box)return;const welcome={triage:'Ola! Sou o agente de triagem. Descreva sua situacao.',atendimento:'Ola! Sou o assistente virtual. Como posso ajudar?',advogado:'Ola! Sou seu assistente juridico senior. Como posso auxiliar?'};box.innerHTML=`<div class="chat-msg ai"><div class="chat-msg-avatar">AI</div><div class="chat-bubble">${welcome[type]||welcome.triage}</div></div>`}
+async function sendChat(){const input=document.getElementById('chatInput');const box=document.getElementById('chatMessages');const msg=input.value.trim();if(!msg)return;box.innerHTML+=`<div class="chat-msg user"><div class="chat-msg-avatar">Voce</div><div class="chat-bubble">${msg}</div></div>`;input.value='';box.scrollTop=box.scrollHeight;setTimeout(()=>{let response='Recebi sua mensagem. Um advogado analisara seu caso.';const m=msg.toLowerCase();if(m.includes('contrato')||m.includes('minuta'))response='Para elaborar, preciso de nomes, CPF/CNPJ, objeto e condicoes.';else if(m.includes('prazo')||m.includes('urgente'))response='Assunto recebido com prioridade. Advogado entrara em contato em ate 2h.';else if(m.includes('trabalho')||m.includes('demissao'))response='Questao trabalhista identificada. Preciso da data da demissao e se tem carteira assinada.';else if(m.includes('divorcio')||m.includes('guarda'))response='Direito de Familia. Ha filhos menores envolvidos?';box.innerHTML+=`<div class="chat-msg ai"><div class="chat-msg-avatar">AI</div><div class="chat-bubble">${response}</div></div>`;box.scrollTop=box.scrollHeight},800)}
+if(token){enterDashboard()}
 </script>
 </body></html>

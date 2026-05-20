@@ -8,5 +8,4 @@ cd backend && python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload > 
 echo "Backend PID: $!"
 cd ~/jurisai/frontend && python3 -m http.server 8080 > ~/jurisai/logs/web.log 2>&1 &
 echo "Frontend PID: $!"
-echo "Acesso: http://localhost:8080"
-echo "API Docs: http://localhost:8000/docs"
+echo "Acesso: http://localhost:8080 | API Docs: http://localhost:8000/docs"
