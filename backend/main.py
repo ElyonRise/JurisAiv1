@@ -1,142 +1,117 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Header, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from typing import Optional, List
+import secrets, jwt, os, json, shutil
 from datetime import datetime, timedelta
-from typing import Optional
-import json, os
-from jose import JWTError, jwt
 from passlib.context import CryptContext
-from dotenv import load_dotenv
+from database import get_db, init_db
+from services.email_service import send_activation_email
+from services.ai_agents import process_agent
 
-ENV_PATH = os.path.expanduser("~/jurisai/.env")
-load_dotenv(ENV_PATH)
-
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
+init_db()
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback")
 ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "480"))
+APP_PORT = int(os.getenv("APP_PORT", "8000"))
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
-app = FastAPI(title="JurisAI API", version="1.0.0")
+app = FastAPI(title="JurisAI v2.0")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+UPLOAD_DIR = os.path.expanduser("~/jurisai/backend/uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-USERS_DB = {
-    "admin": {
-        "username": "admin",
-        "hashed_password": pwd_context.hash("JurisAI2024!"),
-        "role": "admin",
-        "full_name": "Administrador"
-    }
-}
+class RegisterReq(BaseModel): email: str; password: str; role: str; full_name: str; specialty: Optional[str]=None; lat: Optional[float]=None; lng: Optional[float]=None
+class LoginReq(BaseModel): email: str; password: str
+class ActivateReq(BaseModel): token: str
+class ChatReq(BaseModel): agent_type: str; message: str; history: Optional[List[dict]]=[]
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    role: str
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
-class Lead(BaseModel):
-    nome: str
-    telefone: str
-    email: Optional[str] = None
-    assunto: str
-    urgencia: str = "normal"
-    origem: str = "whatsapp"
-
-class Processo(BaseModel):
-    numero: str
-    cliente: str
-    tipo: str
-    status: str = "ativo"
-    descricao: str
-    valor_causa: Optional[float] = None
-
-def create_access_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
-        if payload.get("sub") is None:
-            raise HTTPException(status_code=401, detail="Token invalido")
+        if payload.get("sub") is None: raise HTTPException(401, "Invalido")
         return payload
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Token expirado ou invalido")
+    except: raise HTTPException(401, "Token invalido")
 
-@app.post("/auth/login", response_model=Token)
-async def login(request: LoginRequest):
-    user = USERS_DB.get(request.username)
-    if not user or not pwd_context.verify(request.password, user["hashed_password"]):
-        raise HTTPException(status_code=401, detail="Credenciais invalidas")
-    token = create_access_token({"sub": user["username"], "role": user["role"]})
-    return {"access_token": token, "token_type": "bearer", "role": user["role"]}
+@app.post("/register")
+async def register(req: RegisterReq):
+    db = get_db()
+    if req.role not in ["cliente", "advogado"]: raise HTTPException(400, "Role invalido")
+    exists = db.execute("SELECT id FROM users WHERE email=?", (req.email,)).fetchone()
+    if exists: raise HTTPException(400, "Email ja cadastrado")
+    token = secrets.token_urlsafe(32)
+    db.execute("INSERT INTO users (email, password_hash, role, full_name, specialty, lat, lng) VALUES (?,?,?,?,?,?,?)",
+               (req.email, pwd_context.hash(req.password), req.role, req.full_name, req.specialty, req.lat, req.lng))
+    db.execute("INSERT INTO activation_tokens (token, email) VALUES (?,?)", (token, req.email))
+    db.commit()
+    await send_activation_email(req.email, token)
+    return {"success": True, "message": "Conta criada. Verifique seu email para ativacao."}
 
-@app.get("/health")
-async def health():
-    return {"status": "online", "sistema": "JurisAI", "versao": "1.0.0", "timestamp": datetime.now().isoformat()}
+@app.post("/activate")
+async def activate(req: ActivateReq):
+    db = get_db()
+    row = db.execute("SELECT email FROM activation_tokens WHERE token=?", (req.token,)).fetchone()
+    if not row: raise HTTPException(400, "Token invalido ou expirado")
+    db.execute("UPDATE users SET is_active=1 WHERE email=?", (row["email"],))
+    db.execute("DELETE FROM activation_tokens WHERE token=?", (req.token,))
+    db.commit()
+    return {"success": True, "message": "Conta ativada com sucesso."}
 
-@app.post("/leads", dependencies=[Depends(verify_token)])
-async def criar_lead(lead: Lead):
-    f_path = os.path.expanduser("~/jurisai/crm/leads/leads.json")
-    leads = json.load(open(f_path)) if os.path.exists(f_path) else []
-    d = lead.dict()
-    d["id"] = len(leads) + 1
-    d["criado_em"] = datetime.now().isoformat()
-    d["status"] = "novo"
-    leads.append(d)
-    with open(f_path, "w") as f: json.dump(leads, f, ensure_ascii=False, indent=2)
-    return {"success": True, "lead_id": d["id"], "mensagem": "Lead registrado com sucesso"}
+@app.post("/login")
+async def login(req: LoginReq):
+    db = get_db()
+    user = db.execute("SELECT id, email, password_hash, role, is_active FROM users WHERE email=?", (req.email,)).fetchone()
+    if not user or not pwd_context.verify(req.password, user["password_hash"]):
+        raise HTTPException(401, "Credenciais invalidas")
+    if not user["is_active"]:
+        raise HTTPException(403, "Conta nao ativada. Verifique o email.")
+    token = jwt.encode({"sub": str(user["id"]), "email": user["email"], "role": user["role"], "exp": datetime.utcnow() + timedelta(hours=8)}, SECRET_KEY, algorithm=ALGORITHM)
+    return {"access_token": token, "role": user["role"]}
 
-@app.get("/leads", dependencies=[Depends(verify_token)])
-async def listar_leads(status: Optional[str] = None):
-    f_path = os.path.expanduser("~/jurisai/crm/leads/leads.json")
-    if not os.path.exists(f_path): return {"leads": [], "total": 0}
-    leads = json.load(open(f_path))
-    if status: leads = [l for l in leads if l.get("status") == status]
-    return {"leads": leads, "total": len(leads)}
+@app.post("/chat/{agent_type}")
+async def chat_agent(agent_type: str, req: ChatReq, user=Depends(get_current_user)):
+    if agent_type == "advogado" and user.get("role") != "advogado":
+        raise HTTPException(403, "Apenas advogados podem acessar este assistente")
+    resp = await process_agent(agent_type, req.history or [], req.message)
+    return {"response": resp, "agent": agent_type}
 
-@app.post("/processos", dependencies=[Depends(verify_token)])
-async def criar_processo(processo: Processo):
-    f_path = os.path.expanduser("~/jurisai/crm/cases/processos.json")
-    procs = json.load(open(f_path)) if os.path.exists(f_path) else []
-    d = processo.dict()
-    d["id"] = len(procs) + 1
-    d["criado_em"] = datetime.now().isoformat()
-    procs.append(d)
-    with open(f_path, "w") as f: json.dump(procs, f, ensure_ascii=False, indent=2)
-    return {"success": True, "processo_id": d["id"]}
+@app.get("/lawyers/nearby")
+async def find_lawyers(lat: float = Query(...), lng: float = Query(...), specialty: str = Query(None), user=Depends(get_current_user)):
+    import math
+    def dist(a_lat, a_lng, b_lat, b_lng):
+        R = 6371
+        dlat, dlon = math.radians(b_lat-a_lat), math.radians(b_lng-a_lng)
+        a = math.sin(dlat/2)**2 + math.cos(math.radians(a_lat)) * math.cos(math.radians(b_lat)) * math.sin(dlon/2)**2
+        return R * (2 * math.atan2(math.sqrt(a), math.sqrt(1-a)))
+    db = get_db()
+    rows = db.execute("SELECT id, full_name, specialty, lat, lng FROM users WHERE role='advogado' AND is_active=1").fetchall()
+    result = []
+    for r in rows:
+        if specialty and r["specialty"] != specialty: continue
+        d = dist(lat, lng, r["lat"], r["lng"])
+        if d <= 50: result.append({"id": r["id"], "name": r["full_name"], "specialty": r["specialty"], "dist_km": round(d,1)})
+    result.sort(key=lambda x: x["dist_km"])
+    return {"lawyers": result}
 
-@app.get("/processos", dependencies=[Depends(verify_token)])
-async def listar_processos():
-    f_path = os.path.expanduser("~/jurisai/crm/cases/processos.json")
-    if not os.path.exists(f_path): return {"processos": [], "total": 0}
-    procs = json.load(open(f_path))
-    return {"processos": procs, "total": len(procs)}
+@app.post("/cases/{case_id}/files")
+async def upload_file(case_id: int, file: UploadFile = File(...), user=Depends(get_current_user)):
+    filepath = os.path.join(UPLOAD_DIR, f"{case_id}_{file.filename}")
+    with open(filepath, "wb") as f: shutil.copyfileobj(file.file, f)
+    db = get_db()
+    db.execute("INSERT INTO files (case_id, filename, filepath, uploaded_by) VALUES (?,?,?,?)", (case_id, file.filename, filepath, user["email"]))
+    db.commit()
+    return {"success": True, "path": filepath}
 
-@app.get("/dashboard", dependencies=[Depends(verify_token)])
-async def dashboard():
-    f_l = os.path.expanduser("~/jurisai/crm/leads/leads.json")
-    f_p = os.path.expanduser("~/jurisai/crm/cases/processos.json")
-    leads = json.load(open(f_l)) if os.path.exists(f_l) else []
-    procs = json.load(open(f_p)) if os.path.exists(f_p) else []
-    total_l = len(leads)
-    novos_l = len([l for l in leads if l.get("status") == "novo"])
-    total_p = len(procs)
-    return {
-        "metricas": {"total_leads": total_l, "leads_novos": novos_l, "total_processos": total_p, "conversao_pct": round((total_p / total_l * 100) if total_l > 0 else 0, 1)},
-        "sistema": "online", "timestamp": datetime.now().isoformat()
-    }
+@app.post("/cases")
+async def create_case(client_id: Optional[int]=None, status: str="triagem", user=Depends(get_current_user)):
+    db = get_db()
+    c_id = client_id if user["role"] == "advogado" else user["sub"]
+    cur = db.execute("INSERT INTO cases (client_id, status) VALUES (?,?)", (c_id, status))
+    db.commit()
+    return {"case_id": cur.lastrowid, "status": "criado"}
+
+@app.on_event("startup")
+async def startup():
+    pass
