@@ -6,7 +6,7 @@ from typing import Optional, List
 import secrets, jwt, os, json, shutil, math
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
-from database import get_db, init_db
+from backend.db import get_db, init_db
 from services.email_service import send_activation_email
 from services.ai_agents import process_agent
 
