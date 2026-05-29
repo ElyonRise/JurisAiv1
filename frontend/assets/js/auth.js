@@ -1,5 +1,11 @@
 const API = "https://jurisaiv1.up.railway.app";
 
+function getErrorMessage(data) {
+    if (!data) return "Erro desconhecido";
+    if (typeof data === 'string') return data;
+    return data.detail || data.message || JSON.stringify(data).substring(0, 200);
+}
+
 async function register() {
     const full_name = document.getElementById("full_name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -31,20 +37,25 @@ async function register() {
             body: JSON.stringify(body)
         });
 
-        const data = await response.json().catch(() => ({}));
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = { detail: "Resposta inválida do servidor" };
+        }
 
         if (!response.ok) {
-            console.error("Erro completo:", data);
-            alert(data.detail || data.message || "Erro ao criar conta. Verifique os dados.");
+            console.error("Erro do servidor:", data);
+            alert(getErrorMessage(data));
             return;
         }
 
-        alert("Conta criada com sucesso! Verifique seu e-mail para ativar.");
+        alert("Conta criada com sucesso! Verifique seu e-mail para ativar a conta.");
         window.location.href = "/login.html";
 
     } catch (err) {
-        console.error(err);
-        alert("Não foi possível conectar ao servidor. Tente novamente.");
+        console.error("Erro de conexão:", err);
+        alert("Não foi possível conectar ao servidor. Verifique sua internet.");
     }
 }
 
@@ -64,11 +75,16 @@ async function login() {
             body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json().catch(() => ({}));
+        let data;
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = { detail: "Resposta inválida" };
+        }
 
         if (!response.ok) {
-            console.error("Erro no login:", data);
-            alert(data.detail || data.message || "Credenciais inválidas.");
+            console.error("Erro login:", data);
+            alert(getErrorMessage(data));
             return;
         }
 
