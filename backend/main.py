@@ -2,7 +2,6 @@ import os
 import httpx
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, select
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -16,7 +15,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 ALGORITHM = "HS256"
 
-BACKEND_URL = "https://jurisai-backend-i0zq.onrender.com"
+BACKEND_URL = "https://jurisaiv1.up.railway.app"
 FROM_EMAIL = "noreply@jurisai.example.com"
 FRONTEND_URL = "https://jurisai-rho.vercel.app"
 
@@ -54,14 +53,6 @@ app.add_middleware(
         "http://localhost:8080",
         "http://127.0.0.1:8080",
     ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
