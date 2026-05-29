@@ -1,7 +1,78 @@
+import os
+from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, EmailStr
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, select
+from sqlalchemy.orm import declarative_base, sessionmaker
+from passlib.context import CryptContext
+import jwt
+from datetime import datetime, timedelta
+
+# Configurações do Banco e Segurança
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://postgres:Spancerski!23@db.bavdudpnjjqxvzrqnceo.supabase.co:5432/postgres?sslmode=require")
+SECRET_KEY = os.getenv("SECRET_KEY", "jurisai_chave_super_secreta_2026_mude_esta_chave_agora")
+ALGORITHM = "HS256"
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, nullable=False)
+    oab_number = Column(String, unique=True, index=True, nullable=True)
+    oab_seccional = Column(String, nullable=True)
+    especializacao = Column(String, nullable=True)
+    experiencia = Column(Integer, nullable=True)
+    is_active = Column(Boolean, default=False)
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class RegisterRequest(BaseModel):
+    full_name: str
+    email: EmailStr
+    password: str
+    role: str
+    oab_number: str = None
+    oab_seccional: str = None
+    especializacao: str = None
+    experiencia: int = None
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def create_activation_token(email: str):
+    expire = datetime.utcnow() + timedelta(hours=24)
+    return jwt.encode({"sub": email, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
+
+def send_activation_email(email: str, token: str):
+    pass
+
+@app.get("/")
+def read_root():
+    return {"status": "JurisAI Backend Ativo"}
+
 @app.post("/register", status_code=201)
 def register(data: RegisterRequest, bg: BackgroundTasks, db=Depends(get_db)):
-from sqlalchemy import select
-user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
+    user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
     if user:
         raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
 
