@@ -8,9 +8,8 @@ from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
 
-# Configurações do Banco e Segurança
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://postgres:Spancerski!23@db.bavdudpnjjqxvzrqnceo.supabase.co:5432/postgres?sslmode=require")
-SECRET_KEY = os.getenv("SECRET_KEY", "jurisai_chave_super_secreta_2026_mude_esta_chave_agora")
+SECRET_KEY = os.getenv("SECRET_KEY", "JurisSpancersk!")
 ALGORITHM = "HS256"
 
 engine = create_engine(DATABASE_URL)
@@ -34,7 +33,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "https://jurisai-rho.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
