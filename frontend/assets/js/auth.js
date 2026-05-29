@@ -31,18 +31,20 @@ async function register() {
             body: JSON.stringify(body)
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-            alert(data.detail || data.message || "Erro ao criar conta.");
+            console.error("Erro completo:", data);
+            alert(data.detail || data.message || "Erro ao criar conta. Verifique os dados.");
             return;
         }
 
         alert("Conta criada com sucesso! Verifique seu e-mail para ativar.");
         window.location.href = "/login.html";
+
     } catch (err) {
-        alert("Não foi possível conectar ao servidor.");
         console.error(err);
+        alert("Não foi possível conectar ao servidor. Tente novamente.");
     }
 }
 
@@ -62,9 +64,10 @@ async function login() {
             body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
+            console.error("Erro no login:", data);
             alert(data.detail || data.message || "Credenciais inválidas.");
             return;
         }
@@ -72,33 +75,13 @@ async function login() {
         localStorage.setItem("token", data.access_token);
         localStorage.setItem("userRole", data.role);
         localStorage.setItem("userEmail", email);
-        localStorage.setItem("userName", data.full_name);
+        localStorage.setItem("userName", data.full_name || "");
 
         alert("Login realizado com sucesso!");
         window.location.href = "/dashboard.html";
-    } catch (err) {
-        alert("Não foi possível conectar ao servidor.");
-        console.error(err);
-    }
-}
 
-async function forgotPassword() {
-    const email = document.getElementById("email").value.trim();
-    if (!email) {
-        alert("Informe seu e-mail.");
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API}/forgot-password`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email })
-        });
-        const data = await response.json();
-        alert(data.message || "Se o e-mail existir, você receberá as instruções.");
     } catch (err) {
-        alert("Não foi possível conectar ao servidor.");
         console.error(err);
+        alert("Não foi possível conectar ao servidor.");
     }
 }
