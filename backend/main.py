@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, select
 from sqlalchemy.orm import declarative_base, sessionmaker
-from passlib.context import CryptContext
+import bcrypt
 import jwt
 from datetime import datetime, timedelta
 from typing import Optional
@@ -129,7 +129,7 @@ def get_db():
     finally:
         db.close()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def create_access_token(email: str, role: str) -> str:
     expire = datetime.utcnow() + timedelta(hours=8)
@@ -180,7 +180,7 @@ def register(body: RegisterPayload, bg: BackgroundTasks, db=Depends(get_db)):
     new_user = User(
         full_name=data.full_name,
         email=data.email,
-        hashed_password=pwd_context.hash(data.password),
+        hashed_password=bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode(),
         role=data.role,
         oab_number=data.oab_number if data.role == "lawyer" else None,
         oab_seccional=data.oab_seccional if data.role == "lawyer" else None,
@@ -213,7 +213,7 @@ def activate_account(token: str, db=Depends(get_db)):
 def login(body: LoginPayload, db=Depends(get_db)):
     data = body.resolve()
     user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
-    if not user or not pwd_context.verify(data.password, user.hashed_password):
+    if not user or not bcrypt.checkpw(data.password.encode(), user.hashed_password.encode()):
         raise HTTPException(status_code=401, detail="Credenciais inválidas.")
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Conta não ativada. Verifique seu e-mail.")
