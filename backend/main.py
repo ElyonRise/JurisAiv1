@@ -1,8 +1,7 @@
 @app.post("/register", status_code=201)
 def register(data: RegisterRequest, bg: BackgroundTasks, db=Depends(get_db)):
-    from sqlalchemy import select
-
-    user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
+from sqlalchemy import select
+user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
     if user:
         raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
 
