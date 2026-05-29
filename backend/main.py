@@ -199,22 +199,43 @@ def root(): return {"message": "JurisAI API v2.1 — Online ✅", "docs": "/docs
 @app.get("/health", tags=["status"])
 def health(): return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
  
-@app.post("/register", status_code=201, tags=["auth"])
+@app.post("/register", status_code=201)
 def register(data: RegisterRequest, bg: BackgroundTasks, db=Depends(get_db)):
-    if data.role not in ("client", "lawyer"):
-        raise HTTPException(400, "Role inválido. Use 'client' ou 'lawyer'.")
-    if len(data.password) < 6:
-        raise HTTPException(400, "A senha precisa ter pelo menos 6 caracteres.")
-    if db.query(UserDB).filter(UserDB.email == data.email).first():
-        raise HTTPException(400, "Este e-mail já está cadastrado.")
-    token = secrets.token_urlsafe(32)
-    user = UserDB(email=data.email, full_name=data.full_name,
-                  hashed_password=hash_password(data.password), role=data.role,
-                  specialty=data.specialty, oab=data.oab,
-                  lat=data.lat or 0.0, lng=data.lng or 0.0, activation_token=token)
-    db.add(user); db.commit(); db.refresh(user)
-    bg.add_task(send_activation_email, data.email, data.full_name, token)
-    return {"message": "Conta criada! Verifique seu e-mail para ativar o acesso.", "email": data.email}
+    from sqlalchemy import select
+
+    user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
+    if user:
+        raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
+
+    if data.role == "lawyer":
+        if not data.oab_number or not data.oab_seccional:
+            raise HTTPException(status_code=400, detail="Dados da OAB obrigatórios para advogados.")
+        
+        oab_exists = db.execute(select(User).where(User.oab_number == data.oab_number)).scalar_one_or_none()
+        if oab_exists:
+            raise HTTPException(status_code=400, detail="Número de OAB já cadastrado.")
+
+    hashed = pwd_context.hash(data.password)
+    new_user = User(
+        full_name=data.full_name,
+        email=data.email,
+        hashed_password=hashed,
+        role=data.role,
+        oab_number=data.oab_number if data.role == "lawyer" else None,
+        oab_seccional=data.oab_seccional if data.role == "lawyer" else None,
+        especializacao=data.especializacao if data.role == "lawyer" else None,
+        experiencia=data.experiencia if data.role == "lawyer" else None,
+        is_active=False
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    token = create_activation_token(new_user.email)
+    bg.add_task(send_activation_email, new_user.email, token)
+
+    return {"detail": "Usuário registrado com sucesso. Verifique seu e-mail para ativação."}
  
 @app.get("/activate", tags=["auth"])
 def activate(token: str, db=Depends(get_db)):
