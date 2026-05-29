@@ -7,3 +7,4 @@ data/
 .backend.pid
 logs/
 backups/
+.backend.pid
