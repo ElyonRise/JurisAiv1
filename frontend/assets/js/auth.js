@@ -2,15 +2,15 @@ const API = "https://jurisai-backend-i0zq.onrender.com";
 
 async function register() {
     const full_name = document.getElementById("full_name").value.trim();
-    const email     = document.getElementById("email").value.trim();
-    const password  = document.getElementById("password").value;
-    const role      = document.getElementById("role").value;
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
 
     // Campos extras para advogado
-    const oab_number    = document.getElementById("oab_number")    ? document.getElementById("oab_number").value.trim()    : null;
+    const oab_number = document.getElementById("oab_number") ? document.getElementById("oab_number").value.trim() : null;
     const oab_seccional = document.getElementById("oab_seccional") ? document.getElementById("oab_seccional").value.trim() : null;
     const especializacao = document.getElementById("especializacao") ? document.getElementById("especializacao").value.trim() : null;
-    const experiencia   = document.getElementById("experiencia")   ? parseInt(document.getElementById("experiencia").value) : null;
+    const experiencia = document.getElementById("experiencia") ? parseInt(document.getElementById("experiencia").value) : null;
 
     if (!full_name || !email || !password || !role) {
         alert("Preencha todos os campos obrigatórios.");
@@ -19,11 +19,12 @@ async function register() {
 
     try {
         const body = { full_name, email, password, role };
+
         if (role === "lawyer") {
-            if (oab_number)    body.oab_number    = oab_number;
+            if (oab_number) body.oab_number = oab_number;
             if (oab_seccional) body.oab_seccional = oab_seccional;
             if (especializacao) body.especializacao = especializacao;
-            if (experiencia)   body.experiencia   = experiencia;
+            if (experiencia) body.experiencia = experiencia;
         }
 
         const response = await fetch(`${API}/register`, {
@@ -35,21 +36,22 @@ async function register() {
         const data = await response.json();
 
         if (!response.ok) {
-            // CORREÇÃO: exibe data.detail (string) em vez do objeto inteiro
+            console.error("Erro no registro:", data);
             alert(data.detail || data.message || "Erro ao criar conta.");
             return;
         }
 
-        alert("Conta criada! Verifique seu e-mail para ativar.");
+        alert("Conta criada com sucesso! Verifique seu e-mail para ativar a conta.");
+        window.location.href = "/login.html";  // Redireciona para login
 
     } catch (err) {
-        alert("Não foi possível conectar ao servidor. Tente novamente.");
         console.error(err);
+        alert("Não foi possível conectar ao servidor. Tente novamente.");
     }
 }
 
 async function login() {
-    const email    = document.getElementById("email").value.trim();
+    const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
     if (!email || !password) {
@@ -61,27 +63,29 @@ async function login() {
         const response = await fetch(`${API}/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            // CORREÇÃO: era "username", agora é "email"
             body: JSON.stringify({ email, password })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
+            console.error("Erro no login:", data);
             alert(data.detail || data.message || "Credenciais inválidas.");
             return;
         }
 
-        localStorage.setItem("token",     data.access_token);
-        localStorage.setItem("userRole",  data.role);
+        // Salvar dados no localStorage
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("userRole", data.role);
         localStorage.setItem("userEmail", email);
-        localStorage.setItem("userName",  data.full_name);
+        localStorage.setItem("userName", data.full_name);
 
+        alert("Login realizado com sucesso!");
         window.location.href = "/dashboard.html";
 
     } catch (err) {
-        alert("Não foi possível conectar ao servidor. Tente novamente.");
         console.error(err);
+        alert("Não foi possível conectar ao servidor. Tente novamente.");
     }
 }
 
@@ -101,10 +105,11 @@ async function forgotPassword() {
         });
 
         const data = await response.json();
-        alert(data.message || "Se o e-mail existir, você receberá as instruções.");
 
+        alert(data.message || "Se o e-mail existir, você receberá as instruções em breve.");
+        
     } catch (err) {
-        alert("Não foi possível conectar ao servidor. Tente novamente.");
         console.error(err);
+        alert("Não foi possível conectar ao servidor. Tente novamente.");
     }
 }
