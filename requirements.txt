@@ -9,3 +9,5 @@ resend==0.8.0
 python-dotenv==1.0.1
 pydantic[email]==2.8.2
 email-validator==2.1.1
+PyJWT==2.10.1
+passlib[bcrypt]==1.7.4
