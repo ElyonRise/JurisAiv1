@@ -3,7 +3,7 @@ const API = "https://jurisaiv1.up.railway.app";
 function getErrorMessage(data) {
     if (!data) return "Erro desconhecido";
     if (typeof data === 'string') return data;
-    return data.detail || data.message || JSON.stringify(data).substring(0, 200);
+    return data.detail || data.message || "Erro ao processar requisição";
 }
 
 async function register() {
@@ -37,25 +37,23 @@ async function register() {
             body: JSON.stringify(body)
         });
 
-        let data;
+        let data = {};
         try {
             data = await response.json();
-        } catch (e) {
-            data = { detail: "Resposta inválida do servidor" };
-        }
+        } catch (e) {}
 
         if (!response.ok) {
-            console.error("Erro do servidor:", data);
+            console.error("Erro:", data);
             alert(getErrorMessage(data));
             return;
         }
 
-        alert("Conta criada com sucesso! Verifique seu e-mail para ativar a conta.");
+        alert("Conta criada com sucesso! Verifique seu e-mail para ativar.");
         window.location.href = "/login.html";
 
     } catch (err) {
-        console.error("Erro de conexão:", err);
-        alert("Não foi possível conectar ao servidor. Verifique sua internet.");
+        console.error(err);
+        alert("Não foi possível conectar ao servidor.");
     }
 }
 
@@ -75,12 +73,10 @@ async function login() {
             body: JSON.stringify({ email, password })
         });
 
-        let data;
+        let data = {};
         try {
             data = await response.json();
-        } catch (e) {
-            data = { detail: "Resposta inválida" };
-        }
+        } catch (e) {}
 
         if (!response.ok) {
             console.error("Erro login:", data);
