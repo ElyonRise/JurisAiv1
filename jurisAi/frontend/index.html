@@ -1,0 +1,215 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JurisAI – Escritório de Advocacia Inteligente</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          integrity="sha512-xxxx" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --gold: #c9a84c;
+            --text-light: #e6edf3;
+            --text-muted: #8b949e;
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+        }
+        a { color: var(--gold); text-decoration:none; }
+        a:hover { opacity:0.9; }
+
+        header {
+            padding: 2rem 1rem;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-dark), rgba(13,17,23,0.9));
+        }
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: .5rem;
+            background: linear-gradient(90deg, var(--gold), #e1c96b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            min-height:80vh;
+            padding:0 1rem;
+        }
+        .hero-content {
+            text-align:center;
+            max-width: 600px;
+        }
+        .hero h2 {
+            font-size:2.2rem;
+            margin-bottom:1rem;
+        }
+        .hero p {
+            font-size:1.1rem;
+            margin-bottom:2rem;
+            color:var(--text-muted);
+        }
+        .cta-btn {
+            display:inline-block;
+            background:var(--gold);
+            color:#0d1117;
+            padding:.9rem 2rem;
+            font-weight:600;
+            border-radius:var(--radius);
+            transition:transform .2s, box-shadow .2s;
+        }
+        .cta-btn:hover {
+            transform:translateY(-3px);
+            box-shadow:0 6px 16px rgba(201,168,76,0.4);
+        }
+
+        .services {
+            padding:4rem 1rem;
+            max-width:1200px;
+            margin:0 auto;
+            display:grid;
+            gap:2rem;
+            grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+        }
+        .card {
+            background:var(--bg-card);
+            border-radius:var(--radius);
+            padding:2rem;
+            text-align:center;
+            box-shadow:var(--shadow);
+            transition:transform .3s, box-shadow .3s;
+        }
+        .card:hover {
+            transform:translateY(-8px);
+            box-shadow:0 8px 20px rgba(0,0,0,0.6);
+        }
+        .card i {
+            font-size:2.5rem;
+            color:var(--gold);
+            margin-bottom:1.2rem;
+        }
+        .card h3 {
+            margin-bottom:.8rem;
+            font-size:1.4rem;
+        }
+        .card p {
+            color:var(--text-muted);
+            font-size:.95rem;
+        }
+
+        .whatsapp-float {
+            position:fixed;
+            bottom:2rem;
+            right:2rem;
+            width:56px;
+            height:56px;
+            background:#25d366;
+            color:#fff;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:1.8rem;
+            box-shadow:0 4px 12px rgba(0,0,0,0.3);
+            z-index:1000;
+            transition:background .2s, transform .2s;
+        }
+        .whatsapp-float:hover {
+            background:#1ebe5d;
+            transform:scale(1.1);
+        }
+
+        footer {
+            text-align:center;
+            padding:2rem 1rem;
+            font-size:.9rem;
+            color:var(--text-muted);
+            border-top:1px solid rgba(255,255,255,0.05);
+            margin-top:4rem;
+        }
+
+        @media (max-width:480px) {
+            header h1 {font-size:2.2rem;}
+            .hero h2 {font-size:1.8rem;}
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>JurisAI</h1>
+    <p>Advocacia inteligente: tecnologia a serviço da justiça.</p>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <h2>Transforme sua prática jurídica com IA</h2>
+        <p>Da triagem inicial ao fechamento de contratos, nossa plataforma acelera processos, reduz riscos e
+garante atendimento 24 h.</p>
+        <a href="#services" class="cta-btn">Comece agora</a>
+    </div>
+</section>
+
+<section id="services" class="services">
+    <!-- Card 1 -->
+    <div class="card">
+        <i class="fas fa-search"></i>
+        <h3>Triagem IA</h3>
+        <p>Análise automática de petições e documentos, classificando urgência e relevância em segundos.</p>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card">
+        <i class="fas fa-file-contract"></i>
+        <h3>Contratos Rápidos</h3>
+        <p>Modelos inteligentes que se adaptam ao seu caso, gerando contratos revisáveis em poucos cliques.</p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card">
+        <i class="fas fa-headset"></i>
+        <h3>Atendimento 24h</h3>
+        <p>Chatbot jurídico disponível a qualquer hora para responder dúvidas básicas e agendar consultas.</p>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="card">
+        <i class="fas fa-balance-scale"></i>
+        <h3>Processo Organizado</h3>
+        <p>Dashboard unificado com prazos, movimentações e documentos, tudo sincronizado em tempo real.</p>
+    </div>
+</section>
+
+<!-- WhatsApp floating button -->
+<a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank" rel="noopener">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<footer>
+    © 2025 JurisAI – Todos os direitos reservados. <br>
+    <a href="#">Política de Privacidade</a> | <a href="#">Termos de Uso</a>
+</footer>
+
+</body>
+</html>
+```
