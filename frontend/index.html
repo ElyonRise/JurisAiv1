@@ -3,390 +3,816 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JurisAI – Escritório de Advocacia Inteligente</title>
+    <title>JurisAI – Plataforma de Advocacia Inteligente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         :root {
-            --bg-dark: #070a0e;
-            --bg-card: #12161f;
-            --bg-input: #1a202c;
+            --bg: #06080c;
+            --surface: #0e1118;
+            --surface2: #151b26;
+            --surface3: #1c2535;
             --gold: #c9a84c;
-            --gold-hover: #e1c96b;
-            --text-light: #e6edf3;
-            --text-muted: #8b949e;
-            --radius: 12px;
-            --shadow: 0 8px 24px rgba(0,0,0,0.6);
-            --border: rgba(255, 255, 255, 0.08);
+            --gold2: #e8c97a;
+            --gold-dim: rgba(201,168,76,0.12);
+            --gold-glow: rgba(201,168,76,0.25);
+            --text: #edf2f7;
+            --text2: #a0aec0;
+            --text3: #5a6478;
+            --border: rgba(255,255,255,0.07);
+            --border-gold: rgba(201,168,76,0.3);
+            --danger: #e05252;
+            --success: #4caf82;
+            --r: 14px;
+            --r-sm: 8px;
+            --shadow: 0 20px 60px rgba(0,0,0,0.7);
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
+
         body {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow-x: hidden;
+            position: relative;
         }
 
-        .container {
+        /* Background texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(201,168,76,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 90%, rgba(201,168,76,0.04) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Subtle grid lines */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
             width: 100%;
             max-width: 480px;
-            margin: auto;
-            padding: 2rem 1.5rem;
+            padding: 1.5rem;
+            animation: fadeUp 0.6s ease both;
         }
 
-        .header {
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(24px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        /* ── LOGO ── */
+        .logo-area {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
-        .header img {
-            max-width: 120px;
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #c9a84c, #8a6a1f);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #fff;
             margin-bottom: 1rem;
+            box-shadow: 0 4px 24px rgba(201,168,76,0.35);
         }
-        .header h1 {
-            font-size: 1.8rem;
+        .logo-area h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
             font-weight: 700;
             color: #fff;
             letter-spacing: 0.5px;
-            margin-bottom: 0.25rem;
+            line-height: 1;
         }
-        .header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        .type-tabs {
-            display: flex;
-            background: var(--bg-card);
-            padding: 4px;
-            border-radius: var(--radius);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-        }
-        .tab-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 0.75rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: calc(var(--radius) - 2px);
-            transition: all 0.25s ease;
-        }
-        .tab-btn.active {
-            background: var(--gold);
-            color: var(--bg-dark);
-        }
-
-        .form-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 2rem 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-        .form-group label {
+        .logo-area h1 span { color: var(--gold); }
+        .logo-area small {
             display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text-light);
+            color: var(--text3);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-top: 0.4rem;
         }
-        .input-wrapper {
+
+        /* ── MAIN CARD ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* ── TOP NAV TABS (Login / Cadastro / Recuperar) ── */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text3);
+            padding: 1.1rem 0.5rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s;
             position: relative;
         }
-        .input-wrapper i {
+        .nav-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 2px;
+            transform: scaleX(0);
+            transition: transform 0.25s ease;
+        }
+        .nav-tab.active {
+            color: var(--gold);
+        }
+        .nav-tab.active::after {
+            transform: scaleX(1);
+        }
+        .nav-tab:hover:not(.active) { color: var(--text2); }
+
+        /* ── PANELS ── */
+        .panel { display: none; padding: 2rem 1.75rem; }
+        .panel.active { display: block; animation: panelIn 0.3s ease both; }
+        @keyframes panelIn {
+            from { opacity:0; transform: translateY(8px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        /* ── ROLE SWITCHER (inside panel) ── */
+        .role-row {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 4px;
+            margin-bottom: 1.75rem;
+        }
+        .role-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text3);
+            padding: 0.6rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            border-radius: calc(var(--r-sm) - 2px);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .role-btn.active {
+            background: var(--gold);
+            color: var(--bg);
+        }
+        .role-btn:hover:not(.active) { color: var(--text); }
+
+        /* ── FORM ELEMENTS ── */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--text2);
+            margin-bottom: 0.45rem;
+        }
+        .field {
+            position: relative;
+        }
+        .field i {
             position: absolute;
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1rem;
+            color: var(--text3);
+            font-size: 0.9rem;
+            pointer-events: none;
+            transition: color 0.2s;
         }
-        .form-control {
+        .field input, .field select {
             width: 100%;
-            background: var(--bg-input);
+            background: var(--surface2);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.75rem 1rem 0.75rem 2.7rem;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
-        }
-        select.form-control {
+            border-radius: var(--r-sm);
+            padding: 0.78rem 1rem 0.78rem 2.6rem;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s;
             appearance: none;
+        }
+        .field input::placeholder { color: var(--text3); }
+        .field input:focus, .field select:focus {
+            outline: none;
+            border-color: var(--border-gold);
+            background: var(--surface3);
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+        .field input:focus + i, .field:focus-within i { color: var(--gold); }
+        .field select { cursor: pointer; }
+
+        /* password toggle */
+        .eye-btn {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text3);
             cursor: pointer;
+            padding: 0.25rem;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+        .eye-btn:hover { color: var(--gold); }
+
+        /* extra fields only for lawyer */
+        .lawyer-field { display: none; }
+
+        /* divider */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 1.5rem 0;
+        }
+        .divider-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            color: var(--text3);
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+        .divider-label::before, .divider-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
 
-        .btn-primary {
+        /* ── BUTTONS ── */
+        .btn {
             width: 100%;
-            background: var(--gold);
-            color: var(--bg-dark);
             border: none;
             padding: 0.85rem;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--r-sm);
             cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 1.5rem;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
         }
-        .btn-primary:hover {
-            background: var(--gold-hover);
+        .btn-gold {
+            background: linear-gradient(135deg, #c9a84c, #a8812a);
+            color: #0a0c10;
         }
-        .btn-primary:disabled {
-            background: var(--text-muted);
+        .btn-gold:hover { filter: brightness(1.12); transform: translateY(-1px); }
+        .btn-gold:active { transform: translateY(0); filter: brightness(0.95); }
+        .btn-gold:disabled {
+            background: var(--surface3);
+            color: var(--text3);
             cursor: not-allowed;
-            opacity: 0.6;
+            transform: none;
+            filter: none;
         }
-
-        .success-banner {
-            display: none;
-            background: rgba(201, 168, 76, 0.1);
-            border: 1px solid var(--gold);
-            border-radius: var(--radius);
-            padding: 2rem 1.5rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-        .success-banner.show {
-            display: block;
-        }
-        .success-banner i {
-            font-size: 3rem;
+        .btn-outline {
+            background: none;
+            border: 1px solid var(--border-gold);
             color: var(--gold);
-            margin-bottom: 1rem;
         }
-        .success-banner h2 {
-            font-size: 1.4rem;
-            margin-bottom: 0.5rem;
-            color: #fff;
-        }
-        .success-banner p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
+        .btn-outline:hover { background: var(--gold-dim); }
 
+        /* helper link */
+        .helper-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: -0.6rem;
+            margin-bottom: 1.2rem;
+        }
+        .link-btn {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        .link-btn:hover { color: var(--gold2); }
+
+        /* ── SUCCESS / INFO STATES ── */
+        .info-box {
+            background: var(--gold-dim);
+            border: 1px solid var(--border-gold);
+            border-radius: var(--r-sm);
+            padding: 1.25rem;
+            text-align: center;
+            display: none;
+        }
+        .info-box.show { display: block; animation: panelIn 0.3s ease both; }
+        .info-box i { font-size: 2rem; color: var(--gold); display: block; margin-bottom: 0.6rem; }
+        .info-box h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+        .info-box p { color: var(--text2); font-size: 0.85rem; line-height: 1.5; }
+
+        /* ── TOAST ── */
         .toast {
             position: fixed;
-            bottom: 2rem;
+            bottom: 1.75rem;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            color: #fff;
-            padding: 0.75rem 1.5rem;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.7rem 1.25rem;
             border-radius: 30px;
-            box-shadow: var(--shadow);
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.88rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            transition: transform 0.35s cubic-bezier(.175,.885,.32,1.275);
             z-index: 9999;
-            border: 1px solid var(--border);
+            white-space: nowrap;
+            max-width: 90vw;
         }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-        .toast.success { border-color: #10b981; }
-        .toast.error { border-color: #ef4444; }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: var(--success); }
+        .toast.error   { border-color: var(--danger); }
+        .toast.success i { color: var(--success); }
+        .toast.error   i { color: var(--danger); }
 
-        .lawyer-only { display: none; }
+        /* ── FOOTER ── */
+        .card-footer {
+            padding: 1rem 1.75rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        .card-footer p { color: var(--text3); font-size: 0.78rem; }
+
+        /* spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fa-spin { animation: spin 0.8s linear infinite; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 520px) {
+            .wrapper { padding: 1rem; }
+            .panel { padding: 1.5rem 1.25rem; }
+            .logo-area h1 { font-size: 1.7rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <h1>JurisAI</h1>
-            <p>Plataforma de Advocacia Inteligente</p>
-        </div>
+<div class="wrapper">
 
-        <div class="type-tabs">
-            <button class="tab-btn active" onclick="switchType('client')">Cliente</button>
-            <button class="tab-btn" onclick="switchType('lawyer')">Advogado</button>
-        </div>
-
-        <div id="successBanner" class="success-banner">
-            <i class="fas fa-check-circle"></i>
-            <h2>Cadastro Realizado!</h2>
-            <p id="successMsg"></p>
-        </div>
-
-        <form id="regForm" class="form-card" onsubmit="handleSubmit(event)">
-            <div class="form-group">
-                <label for="nome">Nome Completo</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="nome" class="form-control" placeholder="Ex: João Silva" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="email">E-mail Corporativo</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" class="form-control" placeholder="Ex: joao@empresa.com" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="senha">Senha de Acesso</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="senha" class="form-control" placeholder="••••••••" required>
-                </div>
-            </div>
-
-            <div class="form-group lawyer-only">
-                <label for="oab">Inscrição OAB</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-id-card"></i>
-                    <input type="text" id="oab" class="form-control" placeholder="Ex: 123456">
-                </div>
-            </div>
-
-            <div class="form-group lawyer-only">
-                <label for="seccional">Seccional UF</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <select id="seccional" class="form-control">
-                        <option value="">Selecione...</option>
-                        <option value="SP">São Paulo (SP)</option>
-                        <option value="RJ">Rio de Janeiro (RJ)</option>
-                        <option value="MG">Minas Gerais (MG)</option>
-                        <option value="SC">Santa Catarina (SC)</option>
-                        <option value="RS">Rio Grande do Sul (RS)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group lawyer-only">
-                <label for="especializacao">Especialidade Principal</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-gavel"></i>
-                    <input type="text" id="especializacao" class="form-control" placeholder="Ex: Direito Civil">
-                </div>
-            </div>
-
-            <div class="form-group lawyer-only">
-                <label for="experiencia">Anos de Experiência</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-briefcase"></i>
-                    <input type="number" id="experiencia" class="form-control" placeholder="Ex: 5" min="0">
-                </div>
-            </div>
-
-            <button type="submit" id="btnSubmit" class="btn-primary">
-                <i class="fas fa-user-plus" style="margin-right:.5rem"></i>Criar conta
-            </button>
-        </form>
+    <!-- Logo -->
+    <div class="logo-area">
+        <div class="logo-icon"><i class="fas fa-balance-scale"></i></div>
+        <h1>Juris<span>AI</span></h1>
+        <small>Plataforma de Advocacia Inteligente</small>
     </div>
 
-    <div id="toast" class="toast"></div>
+    <!-- Card -->
+    <div class="card">
 
-    <script>
-        // Configuração direta apontando para o seu backend no Render
-        const API = "https://jurisai-backend-i0zq.onrender.com";
-        let currentType = 'client';
+        <!-- Nav tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPanel('login')">
+                <i class="fas fa-sign-in-alt" style="margin-right:.35rem;font-size:.8rem"></i>Entrar
+            </button>
+            <button class="nav-tab" onclick="showPanel('register')">
+                <i class="fas fa-user-plus" style="margin-right:.35rem;font-size:.8rem"></i>Cadastrar
+            </button>
+            <button class="nav-tab" onclick="showPanel('reset')">
+                <i class="fas fa-key" style="margin-right:.35rem;font-size:.8rem"></i>Recuperar
+            </button>
+        </div>
 
-        function switchType(type) {
-            currentType = type;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        <!-- ══ PANEL: LOGIN ══ -->
+        <div class="panel active" id="panel-login">
+            <div class="role-row">
+                <button class="role-btn active" onclick="setRole('login','client',this)">Cliente</button>
+                <button class="role-btn" onclick="setRole('login','lawyer',this)">Advogado</button>
+            </div>
 
-            const lawyerFields = document.querySelectorAll('.lawyer-only');
-            if(type === 'lawyer') {
-                lawyerFields.forEach(f => f.style.display = 'block');
-                document.getElementById('oab').required = true;
-                document.getElementById('seccional').required = true;
+            <div class="info-box" id="login-success">
+                <i class="fas fa-check-circle"></i>
+                <h3>Acesso confirmado!</h3>
+                <p id="login-success-msg"></p>
+            </div>
+
+            <div id="login-form">
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <div class="field">
+                        <input type="email" id="login-email" placeholder="seu@email.com" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="field">
+                        <input type="password" id="login-senha" placeholder="••••••••" required>
+                        <i class="fas fa-lock"></i>
+                        <button type="button" class="eye-btn" onclick="togglePwd('login-senha',this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="helper-row">
+                    <button class="link-btn" onclick="showPanel('reset')">Esqueci minha senha</button>
+                </div>
+                <button class="btn btn-gold" id="btn-login" onclick="handleLogin()">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Entrar na plataforma
+                </button>
+            </div>
+        </div>
+
+        <!-- ══ PANEL: CADASTRO ══ -->
+        <div class="panel" id="panel-register">
+            <div class="role-row">
+                <button class="role-btn active" onclick="setRole('reg','client',this)">Cliente</button>
+                <button class="role-btn" onclick="setRole('reg','lawyer',this)">Advogado</button>
+            </div>
+
+            <div class="info-box" id="reg-success">
+                <i class="fas fa-envelope-open-text"></i>
+                <h3>Cadastro realizado!</h3>
+                <p id="reg-success-msg"></p>
+            </div>
+
+            <div id="reg-form">
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <div class="field">
+                        <input type="text" id="reg-nome" placeholder="João Silva" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <div class="field">
+                        <input type="email" id="reg-email" placeholder="joao@empresa.com" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <div class="field">
+                        <input type="password" id="reg-senha" placeholder="Mínimo 8 caracteres" required>
+                        <i class="fas fa-lock"></i>
+                        <button type="button" class="eye-btn" onclick="togglePwd('reg-senha',this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lawyer extras -->
+                <div class="lawyer-field form-group" id="reg-oab-group">
+                    <label>Inscrição OAB</label>
+                    <div class="field">
+                        <input type="text" id="reg-oab" placeholder="Ex: 123456">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                </div>
+                <div class="lawyer-field form-group" id="reg-seccional-group">
+                    <label>Seccional UF</label>
+                    <div class="field">
+                        <select id="reg-seccional">
+                            <option value="">Selecione o estado...</option>
+                            <option value="AC">Acre (AC)</option>
+                            <option value="AL">Alagoas (AL)</option>
+                            <option value="AP">Amapá (AP)</option>
+                            <option value="AM">Amazonas (AM)</option>
+                            <option value="BA">Bahia (BA)</option>
+                            <option value="CE">Ceará (CE)</option>
+                            <option value="DF">Distrito Federal (DF)</option>
+                            <option value="ES">Espírito Santo (ES)</option>
+                            <option value="GO">Goiás (GO)</option>
+                            <option value="MA">Maranhão (MA)</option>
+                            <option value="MT">Mato Grosso (MT)</option>
+                            <option value="MS">Mato Grosso do Sul (MS)</option>
+                            <option value="MG">Minas Gerais (MG)</option>
+                            <option value="PA">Pará (PA)</option>
+                            <option value="PB">Paraíba (PB)</option>
+                            <option value="PR">Paraná (PR)</option>
+                            <option value="PE">Pernambuco (PE)</option>
+                            <option value="PI">Piauí (PI)</option>
+                            <option value="RJ">Rio de Janeiro (RJ)</option>
+                            <option value="RN">Rio Grande do Norte (RN)</option>
+                            <option value="RS">Rio Grande do Sul (RS)</option>
+                            <option value="RO">Rondônia (RO)</option>
+                            <option value="RR">Roraima (RR)</option>
+                            <option value="SC">Santa Catarina (SC)</option>
+                            <option value="SP">São Paulo (SP)</option>
+                            <option value="SE">Sergipe (SE)</option>
+                            <option value="TO">Tocantins (TO)</option>
+                        </select>
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                </div>
+                <div class="lawyer-field form-group" id="reg-spec-group">
+                    <label>Especialidade Principal</label>
+                    <div class="field">
+                        <input type="text" id="reg-spec" placeholder="Ex: Direito Civil">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                </div>
+                <div class="lawyer-field form-group" id="reg-exp-group">
+                    <label>Anos de Experiência</label>
+                    <div class="field">
+                        <input type="number" id="reg-exp" placeholder="Ex: 5" min="0">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                </div>
+
+                <button class="btn btn-gold" id="btn-register" onclick="handleRegister()">
+                    <i class="fas fa-user-plus"></i> Criar conta
+                </button>
+            </div>
+        </div>
+
+        <!-- ══ PANEL: RECUPERAÇÃO ══ -->
+        <div class="panel" id="panel-reset">
+
+            <div class="info-box" id="reset-success">
+                <i class="fas fa-paper-plane"></i>
+                <h3>E-mail enviado!</h3>
+                <p id="reset-success-msg"></p>
+            </div>
+
+            <div id="reset-form">
+                <p style="color:var(--text2);font-size:.9rem;margin-bottom:1.5rem;line-height:1.6">
+                    Informe seu e-mail cadastrado. Enviaremos um link para você criar uma nova senha.
+                </p>
+                <div class="form-group">
+                    <label>E-mail cadastrado</label>
+                    <div class="field">
+                        <input type="email" id="reset-email" placeholder="seu@email.com" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+                <button class="btn btn-gold" id="btn-reset" onclick="handleReset()">
+                    <i class="fas fa-paper-plane"></i> Enviar link de recuperação
+                </button>
+                <button class="btn btn-outline" style="margin-top:.75rem" onclick="showPanel('login')">
+                    <i class="fas fa-arrow-left"></i> Voltar ao login
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+            <p>© 2026 JurisAI · Plataforma protegida e criptografada</p>
+        </div>
+    </div><!-- /card -->
+</div><!-- /wrapper -->
+
+<!-- Toast -->
+<div id="toast" class="toast">
+    <i class="fas fa-circle-info"></i>
+    <span id="toast-msg"></span>
+</div>
+
+<script>
+    const API = "https://jurisai-backend-i0zq.onrender.com";
+
+    let loginRole = 'client';
+    let regRole   = 'client';
+
+    /* ─── PANEL NAVIGATION ─── */
+    function showPanel(name) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('panel-' + name).classList.add('active');
+        const tabs = document.querySelectorAll('.nav-tab');
+        const map = { login:0, register:1, reset:2 };
+        tabs[map[name]].classList.add('active');
+    }
+
+    /* ─── ROLE SWITCHER ─── */
+    function setRole(panel, role, btn) {
+        if (panel === 'login') loginRole = role;
+        else regRole = role;
+
+        btn.closest('.role-row').querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (panel === 'reg') {
+            const isLawyer = role === 'lawyer';
+            document.querySelectorAll('.lawyer-field').forEach(el => {
+                el.style.display = isLawyer ? 'block' : 'none';
+            });
+            if (isLawyer) {
+                document.getElementById('reg-oab').required = true;
+                document.getElementById('reg-seccional').required = true;
             } else {
-                lawyerFields.forEach(f => f.style.display = 'none');
-                document.getElementById('oab').required = false;
-                document.getElementById('seccional').required = false;
+                document.getElementById('reg-oab').required = false;
+                document.getElementById('reg-seccional').required = false;
             }
         }
+    }
 
-        function showToast(msg, type='') {
-            const t = document.getElementById('toast');
-            t.className = `toast show ${type}`;
-            t.innerHTML = type === 'success' 
-                ? `<i class="fas fa-check-circle" style="color:#10b981"></i> ${msg}`
-                : `<i class="fas fa-exclamation-circle" style="color:#ef4444"></i> ${msg}`;
-            setTimeout(() => t.classList.remove('show'), 4000);
+    /* ─── PASSWORD TOGGLE ─── */
+    function togglePwd(id, btn) {
+        const input = document.getElementById(id);
+        const icon  = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+
+    /* ─── TOAST ─── */
+    function toast(msg, type = '') {
+        const el = document.getElementById('toast');
+        const icon = el.querySelector('i');
+        const span = document.getElementById('toast-msg');
+        span.textContent = msg;
+        el.className = `toast show ${type}`;
+        icon.className = type === 'success' ? 'fas fa-check-circle' :
+                         type === 'error'   ? 'fas fa-exclamation-circle' :
+                                              'fas fa-circle-info';
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.remove('show'), 4500);
+    }
+
+    /* ─── BUTTON STATE ─── */
+    function btnLoad(id, loading, label, icon) {
+        const btn = document.getElementById(id);
+        btn.disabled = loading;
+        btn.innerHTML = loading
+            ? `<i class="fas fa-spinner fa-spin"></i> Aguarde...`
+            : `<i class="${icon}"></i> ${label}`;
+    }
+
+    /* ─── LOGIN ─── */
+    async function handleLogin() {
+        const email    = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-senha').value;
+        if (!email || !password) { toast('Preencha todos os campos.', 'error'); return; }
+
+        btnLoad('btn-login', true);
+        try {
+            const res  = await fetch(`${API}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, role: loginRole })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                if (data.access_token) localStorage.setItem('jurisai_token', data.access_token);
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('login-success-msg').textContent =
+                    `Bem-vindo de volta! Redirecionando para o dashboard...`;
+                document.getElementById('login-success').classList.add('show');
+                toast('Login realizado com sucesso!', 'success');
+            } else {
+                toast(data.detail || 'Credenciais inválidas.', 'error');
+            }
+        } catch {
+            toast('Não foi possível conectar ao servidor. Tente novamente.', 'error');
+        }
+        btnLoad('btn-login', false, 'Entrar na plataforma', 'fas fa-arrow-right-to-bracket');
+    }
+
+    /* ─── REGISTER ─── */
+    async function handleRegister() {
+        const name     = document.getElementById('reg-nome').value.trim();
+        const email    = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-senha').value;
+
+        if (!name || !email || !password) { toast('Preencha nome, e-mail e senha.', 'error'); return; }
+        if (password.length < 8) { toast('A senha deve ter ao menos 8 caracteres.', 'error'); return; }
+
+        const payload = { full_name: name, email, password, role: regRole };
+
+        if (regRole === 'lawyer') {
+            const oab = document.getElementById('reg-oab').value.trim();
+            const sec = document.getElementById('reg-seccional').value;
+            if (!oab || !sec) { toast('Informe OAB e seccional para advogados.', 'error'); return; }
+            payload.oab_number     = oab;
+            payload.oab_seccional  = sec;
+            payload.especializacao = document.getElementById('reg-spec').value.trim();
+            payload.experiencia    = parseInt(document.getElementById('reg-exp').value) || 0;
         }
 
-        async function handleSubmit(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('nome').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('senha').value;
+        btnLoad('btn-register', true);
+        try {
+            const res  = await fetch(`${API}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
 
-            const payload = {
-                full_name: name,
-                email: email,
-                password: password,
-                role: currentType
-            };
-
-            if (currentType === 'lawyer') {
-                payload.oab_number = document.getElementById('oab').value.trim();
-                payload.oab_seccional = document.getElementById('seccional').value;
-                payload.especializacao = document.getElementById('especializacao').value.trim();
-                payload.experiencia = parseInt(document.getElementById('experiencia').value) || 0;
+            if (res.ok) {
+                document.getElementById('reg-form').style.display = 'none';
+                document.getElementById('reg-success-msg').textContent =
+                    `Enviamos um link de ativação para ${email}. Verifique sua caixa de entrada e spam.`;
+                document.getElementById('reg-success').classList.add('show');
+                toast('Conta criada! Verifique seu e-mail.', 'success');
+            } else {
+                toast(data.detail || 'Erro ao criar conta.', 'error');
             }
-
-            const btn = document.getElementById('btnSubmit');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:.5rem"></i>Aguarde...';
-
-            try {
-                const res = await fetch(`${API}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    document.getElementById('regForm').style.display = 'none';
-                    document.querySelector('.type-tabs').style.display = 'none';
-                    const banner = document.getElementById('successBanner');
-                    document.getElementById('successMsg').textContent = `Enviamos um link de ativação para ${email}. Verifique sua caixa de entrada.`;
-                    banner.classList.add('show');
-                    showToast('Conta criada! Verifique seu e-mail.', 'success');
-                } else {
-                    showToast(data.detail || 'Erro ao criar conta.', 'error');
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-user-plus" style="margin-right:.5rem"></i>Criar conta';
-                }
-            } catch (err) {
-                showToast('Não foi possível conectar ao servidor.', 'error');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-user-plus" style="margin-right:.5rem"></i>Criar conta';
-            }
+        } catch {
+            toast('Não foi possível conectar ao servidor. Tente novamente.', 'error');
         }
-    </script>
+        btnLoad('btn-register', false, 'Criar conta', 'fas fa-user-plus');
+    }
+
+    /* ─── PASSWORD RESET ─── */
+    async function handleReset() {
+        const email = document.getElementById('reset-email').value.trim();
+        if (!email) { toast('Informe seu e-mail.', 'error'); return; }
+
+        btnLoad('btn-reset', true);
+        try {
+            const res  = await fetch(`${API}/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+
+            // Always show success to avoid user enumeration
+            document.getElementById('reset-form').style.display = 'none';
+            document.getElementById('reset-success-msg').textContent =
+                `Se ${email} estiver cadastrado, você receberá o link em instantes.`;
+            document.getElementById('reset-success').classList.add('show');
+            toast('Verifique sua caixa de entrada!', 'success');
+        } catch {
+            // Still show success state
+            document.getElementById('reset-form').style.display = 'none';
+            document.getElementById('reset-success-msg').textContent =
+                `Se ${email} estiver cadastrado, você receberá o link em instantes.`;
+            document.getElementById('reset-success').classList.add('show');
+        }
+        btnLoad('btn-reset', false, 'Enviar link de recuperação', 'fas fa-paper-plane');
+    }
+
+    /* ─── ENTER KEY SUPPORT ─── */
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        const active = document.querySelector('.panel.active').id;
+        if (active === 'panel-login')    handleLogin();
+        if (active === 'panel-register') handleRegister();
+        if (active === 'panel-reset')    handleReset();
+    });
+</script>
 </body>
 </html>

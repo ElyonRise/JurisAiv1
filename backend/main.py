@@ -34,13 +34,18 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "https://jurisai-rho.vercel.app",
-    "https://jurisai-jdlaa1jlm-elyonrises-projects.vercel.app",
-    "https://jurisai-git-main-elyonrises-projects.vercel.app",
-],
-class RegisterRequest(BaseModel):
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "https://jurisai-rho.vercel.app",
+        "https://jurisai-git-main-elyonrises-projects.vercel.app"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Schemas ajustados para capturar o objeto "payload" enviado pelo Front-end
+class RegisterData(BaseModel):
     full_name: str
     email: EmailStr
     password: str
@@ -49,6 +54,12 @@ class RegisterRequest(BaseModel):
     oab_seccional: str = None
     especializacao: str = None
     experiencia: int = None
+
+class RegisterPayload(BaseModel):
+    payload: RegisterData
+
+class ForgotPasswordPayload(BaseModel):
+    payload: dict
 
 def get_db():
     db = SessionLocal()
@@ -71,7 +82,9 @@ def read_root():
     return {"status": "JurisAI Backend Ativo"}
 
 @app.post("/register", status_code=201)
-def register(data: RegisterRequest, bg: BackgroundTasks, db=Depends(get_db)):
+def register(body: RegisterPayload, bg: BackgroundTasks, db=Depends(get_db)):
+    data = body.payload
+    
     user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
     if user:
         raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
@@ -105,3 +118,7 @@ def register(data: RegisterRequest, bg: BackgroundTasks, db=Depends(get_db)):
     bg.add_task(send_activation_email, new_user.email, token)
 
     return {"detail": "Usuário registrado com sucesso. Verifique seu e-mail para ativação."}
+
+@app.post("/forgot-password")
+def forgot_password(body: ForgotPasswordPayload):
+    return {"message": "email sent"}
