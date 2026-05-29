@@ -2,6 +2,7 @@ import os
 import httpx
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, select
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -46,6 +47,17 @@ class User(Base):
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://jurisai-rho.vercel.app",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_middleware(
     CORSMiddleware,
