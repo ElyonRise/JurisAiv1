@@ -10,7 +10,6 @@ import jwt
 from datetime import datetime, timedelta
 from typing import Optional
 
-# ── Configurações ──────────────────────────────────────────────────────────────
 DATABASE_URL = os.getenv("DATABASE_URL")
 SECRET_KEY = os.getenv("SECRET_KEY")
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
@@ -19,9 +18,6 @@ ALGORITHM = "HS256"
 BACKEND_URL = "https://jurisai-backend-i0zq.onrender.com"
 FROM_EMAIL = "noreply@jurisai.example.com"
 FRONTEND_URL = "https://jurisai-rho.vercel.app"
-
-# Suporte ao Render
-PORT = int(os.getenv("PORT", 8000))
 
 if not DATABASE_URL:
     raise RuntimeError("Variável DATABASE_URL não definida no ambiente.")
@@ -34,7 +30,6 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# ── Modelo ─────────────────────────────────────────────────────────────────────
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -50,24 +45,16 @@ class User(Base):
 
 Base.metadata.create_all(bind=engine)
 
-# ── App & CORS ─────────────────────────────────────────────────────────────────
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "https://jurisai-rho.vercel.app",
-        "https://jurisai-git-main-elyonrises-projects.vercel.app",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ── Schemas ────────────────────────────────────────────────────────────────────
 class RegisterData(BaseModel):
     full_name: str
     email: EmailStr
@@ -132,7 +119,6 @@ class ForgotPasswordPayload(BaseModel):
             return self.email
         raise HTTPException(status_code=422, detail="E-mail obrigatório.")
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
 def get_db():
     db = SessionLocal()
     try:
@@ -155,19 +141,10 @@ def create_reset_token(email: str) -> str:
     return jwt.encode({"sub": email, "type": "reset", "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
 def send_email(to: str, subject: str, html: str):
-    """Envia e-mail via Resend API."""
     response = httpx.post(
         "https://api.resend.com/emails",
-        headers={
-            "Authorization": f"Bearer {RESEND_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "from": FROM_EMAIL,
-            "to": [to],
-            "subject": subject,
-            "html": html,
-        },
+        headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
+        json={"from": FROM_EMAIL, "to": [to], "subject": subject, "html": html},
         timeout=10,
     )
     if response.status_code not in (200, 201):
@@ -175,31 +152,14 @@ def send_email(to: str, subject: str, html: str):
 
 def send_activation_email(email: str, token: str):
     link = f"{BACKEND_URL}/activate?token={token}"
-    html = f"""
-    <h2>Bem-vindo ao JurisAI!</h2>
-    <p>Clique no botão abaixo para ativar sua conta:</p>
-    <a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">
-        Ativar minha conta
-    </a>
-    <p>Este link expira em 24 horas.</p>
-    <p>Se você não criou uma conta, ignore este e-mail.</p>
-    """
+    html = f"""<h2>Bem-vindo ao JurisAI!</h2><p>Clique no botão abaixo para ativar sua conta:</p><a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">Ativar minha conta</a><p>Este link expira em 24 horas.</p>"""
     send_email(email, "Ative sua conta JurisAI", html)
 
 def send_reset_email(email: str, token: str):
     link = f"{FRONTEND_URL}/reset-password?token={token}"
-    html = f"""
-    <h2>Redefinição de senha — JurisAI</h2>
-    <p>Clique no botão abaixo para redefinir sua senha:</p>
-    <a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">
-        Redefinir senha
-    </a>
-    <p>Este link expira em 1 hora.</p>
-    <p>Se você não solicitou a redefinição, ignore este e-mail.</p>
-    """
+    html = f"""<h2>Redefinição de senha — JurisAI</h2><p>Clique no botão abaixo para redefinir sua senha:</p><a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">Redefinir senha</a><p>Este link expira em 1 hora.</p>"""
     send_email(email, "Redefinição de senha JurisAI", html)
 
-# ── Rotas ──────────────────────────────────────────────────────────────────────
 @app.get("/")
 def read_root():
     return {"status": "JurisAI Backend Ativo"}
@@ -237,16 +197,14 @@ def activate_account(token: str, db=Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=400, detail="Token de ativação expirado.")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=400, detail="Token de ativação inválido.")
+    except:
+        raise HTTPException(status_code=400, detail="Token inválido ou expirado.")
     user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
     user.is_active = True
     db.commit()
-    return {"detail": "Conta ativada com sucesso. Você já pode fazer login."}
+    return {"detail": "Conta ativada com sucesso."}
 
 @app.post("/login")
 def login(body: LoginPayload, db=Depends(get_db)):
@@ -272,9 +230,3 @@ def forgot_password(body: ForgotPasswordPayload, bg: BackgroundTasks, db=Depends
         token = create_reset_token(email)
         bg.add_task(send_reset_email, email, token)
     return {"message": "Se o e-mail existir, você receberá as instruções em breve."}
-
-
-# Para rodar localmente
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
