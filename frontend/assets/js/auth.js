@@ -1,9 +1,18 @@
 const API = "https://jurisaiv1.up.railway.app";
 
-function getErrorMessage(data) {
-    if (!data) return "Erro desconhecido";
-    if (typeof data === 'string') return data;
-    return data.detail || data.message || "Erro ao processar requisição";
+function safeAlert(msg) {
+    if (msg === null || msg === undefined) {
+        alert("Erro desconhecido");
+        return;
+    }
+    if (typeof msg === "string") {
+        alert(msg);
+    } else if (typeof msg === "object") {
+        const errorText = msg.detail || msg.message || JSON.stringify(msg);
+        alert(errorText);
+    } else {
+        alert(String(msg));
+    }
 }
 
 async function register() {
@@ -18,7 +27,7 @@ async function register() {
     const experiencia = document.getElementById("experiencia") ? parseInt(document.getElementById("experiencia").value) : null;
 
     if (!full_name || !email || !password || !role) {
-        alert("Preencha todos os campos obrigatórios.");
+        safeAlert("Preencha todos os campos obrigatórios.");
         return;
     }
 
@@ -40,60 +49,21 @@ async function register() {
         let data = {};
         try {
             data = await response.json();
-        } catch (e) {}
+        } catch (e) {
+            console.error("Erro ao parsear JSON", e);
+        }
 
         if (!response.ok) {
-            console.error("Erro:", data);
-            alert(getErrorMessage(data));
+            console.error("Erro backend:", data);
+            safeAlert(data);
             return;
         }
 
-        alert("Conta criada com sucesso! Verifique seu e-mail para ativar.");
+        safeAlert("Conta criada com sucesso! Verifique seu e-mail para ativar.");
         window.location.href = "/login.html";
 
     } catch (err) {
         console.error(err);
-        alert("Não foi possível conectar ao servidor.");
-    }
-}
-
-async function login() {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value;
-
-    if (!email || !password) {
-        alert("Preencha e-mail e senha.");
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-        });
-
-        let data = {};
-        try {
-            data = await response.json();
-        } catch (e) {}
-
-        if (!response.ok) {
-            console.error("Erro login:", data);
-            alert(getErrorMessage(data));
-            return;
-        }
-
-        localStorage.setItem("token", data.access_token);
-        localStorage.setItem("userRole", data.role);
-        localStorage.setItem("userEmail", email);
-        localStorage.setItem("userName", data.full_name || "");
-
-        alert("Login realizado com sucesso!");
-        window.location.href = "/dashboard.html";
-
-    } catch (err) {
-        console.error(err);
-        alert("Não foi possível conectar ao servidor.");
+        safeAlert("Não foi possível conectar ao servidor. Tente novamente.");
     }
 }
