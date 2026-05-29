@@ -8,3 +8,5 @@ data/
 logs/
 backups/
 .backend.pid
+.vercel
+.env*

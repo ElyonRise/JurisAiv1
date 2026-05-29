@@ -1,26 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JurisAI – Plataforma de Advocacia Inteligente</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <style>
+
+        :root {
+            --bg: #06080c;
+            --surface: #0e1118;
+            --surface2: #151b26;
+            --surface3: #1c2535;
+            --gold: #c9a84c;
+            --gold2: #e8c97a;
+            --gold-dim: rgba(201,168,76,0.12);
+            --gold-glow: rgba(201,168,76,0.25);
+            --text: #edf2f7;
+            --text2: #a0aec0;
+            --text3: #5a6478;
+            --border: rgba(255,255,255,0.07);
+            --border-gold: rgba(201,168,76,0.3);
+            --danger: #e05252;
+            --success: #4caf82;
+            --r: 14px;
+            --r-sm: 8px;
+            --shadow: 0 20px 60px rgba(0,0,0,0.7);
+        }
+
+        * {
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .wrapper {
+            width:100%;
+            max-width:480px;
+            padding:1rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border:1px solid var(--border);
+            border-radius:var(--r);
+            overflow:hidden;
+        }
+
+        .nav-tabs {
+            display:flex;
+            border-bottom:1px solid var(--border);
+        }
+
+        .nav-tab {
+            flex:1;
+            background:none;
+            border:none;
+            color:var(--text3);
+            padding:1rem;
+            cursor:pointer;
+            font-weight:bold;
+        }
+
+        .nav-tab.active {
+            color:var(--gold);
+            border-bottom:2px solid var(--gold);
+        }
+
+        .panel {
+            display:none;
+            padding:2rem;
+        }
+
+        .panel.active {
+            display:block;
+        }
+
+        .role-row {
+            display:flex;
+            gap:.5rem;
+            margin-bottom:1.5rem;
+        }
+
+        .role-btn {
+            flex:1;
+            border:none;
+            padding:.7rem;
+            cursor:pointer;
+            border-radius:8px;
+            background:var(--surface2);
+            color:var(--text2);
+        }
+
+        .role-btn.active {
+            background:var(--gold);
+            color:#000;
+        }
+
+        .form-group {
+            margin-bottom:1rem;
+        }
+
+        .form-group label {
+            display:block;
+            margin-bottom:.4rem;
+            color:var(--text2);
+        }
+
+        .field {
+            position:relative;
+        }
+
+        .field input,
+        .field select {
+            width:100%;
+            background:var(--surface2);
+            border:1px solid var(--border);
+            color:white;
+            padding:.85rem;
+            border-radius:8px;
+        }
+
+        .btn {
+            width:100%;
+            padding:.9rem;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:bold;
+            margin-top:1rem;
+        }
+
+        .btn-gold {
+            background:var(--gold);
+            color:black;
+        }
+
+        .lawyer-field {
+            display:none;
+        }
+
+        .toast {
+            position:fixed;
+            bottom:20px;
+            left:50%;
+            transform:translateX(-50%);
+            background:#111;
+            color:#fff;
+            padding:1rem 1.5rem;
+            border-radius:10px;
+            display:none;
+            z-index:9999;
+        }
+
+        .toast.show {
+            display:block;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <div class="card">
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPanel('login')">
+                Entrar
+            </button>
+
+            <button class="nav-tab" onclick="showPanel('register')">
+                Cadastrar
+            </button>
+
+            <button class="nav-tab" onclick="showPanel('reset')">
+                Recuperar
+            </button>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="panel active" id="panel-login">
+
+            <div class="role-row">
+                <button class="role-btn active"
+                        onclick="setRole('login','client',this)">
+                    Cliente
+                </button>
+
+                <button class="role-btn"
+                        onclick="setRole('login','lawyer',this)">
+                    Advogado
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label>E-mail</label>
+                <div class="field">
+                    <input type="email" id="login-email">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <div class="field">
+                    <input type="password" id="login-senha">
+                </div>
+            </div>
+
+            <button class="btn btn-gold"
+                    id="btn-login"
+                    onclick="handleLogin()">
+                Entrar
+            </button>
+
+        </div>
+
+        <!-- REGISTER -->
+        <div class="panel" id="panel-register">
+
+            <div class="role-row">
+
+                <button class="role-btn active"
+                        onclick="setRole('reg','client',this)">
+                    Cliente
+                </button>
+
+                <button class="role-btn"
+                        onclick="setRole('reg','lawyer',this)">
+                    Advogado
+                </button>
+
+            </div>
+
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <div class="field">
+                    <input type="text" id="reg-nome">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>E-mail</label>
+                <div class="field">
+                    <input type="email" id="reg-email">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <div class="field">
+                    <input type="password" id="reg-senha">
+                </div>
+            </div>
+
+            <!-- Lawyer -->
+
+            <div class="lawyer-field form-group">
+                <label>OAB</label>
+                <div class="field">
+                    <input type="text" id="reg-oab">
+                </div>
+            </div>
+
+            <div class="lawyer-field form-group">
+                <label>Seccional</label>
+                <div class="field">
+                    <select id="reg-seccional">
+                        <option value="">Selecione</option>
+                        <option value="SP">SP</option>
+                        <option value="RJ">RJ</option>
+                        <option value="MG">MG</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="lawyer-field form-group">
+                <label>Especialização</label>
+                <div class="field">
+                    <input type="text" id="reg-spec">
+                </div>
+            </div>
+
+            <div class="lawyer-field form-group">
+                <label>Experiência</label>
+                <div class="field">
+                    <input type="number" id="reg-exp">
+                </div>
+            </div>
+
+            <button class="btn btn-gold"
+                    id="btn-register"
+                    onclick="handleRegister()">
+                Criar Conta
+            </button>
+
+        </div>
+
+        <!-- RESET -->
+        <div class="panel" id="panel-reset">
+
+            <div class="form-group">
+                <label>E-mail</label>
+
+                <div class="field">
+                    <input type="email" id="reset-email">
+                </div>
+            </div>
+
+            <button class="btn btn-gold"
+                    onclick="handleReset()">
+                Recuperar Senha
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="toast" id="toast">
+    <span id="toast-msg"></span>
+</div>
+
 <script>
+
 const API = "https://jurisai-backend-i0zq.onrender.com";
 
-let loginRole = 'client';
-let regRole   = 'client';
+let loginRole = "client";
+let regRole   = "client";
 
-/* ─────────────────────────────
-   PANEL NAVIGATION
-───────────────────────────── */
+/* NAVIGATION */
+
 function showPanel(name) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 
-    document.getElementById('panel-' + name).classList.add('active');
+    document.querySelectorAll('.panel')
+        .forEach(p => p.classList.remove('active'));
+
+    document.querySelectorAll('.nav-tab')
+        .forEach(t => t.classList.remove('active'));
+
+    document.getElementById('panel-' + name)
+        .classList.add('active');
 
     const tabs = document.querySelectorAll('.nav-tab');
-    const map = { login:0, register:1, reset:2 };
+
+    const map = {
+        login:0,
+        register:1,
+        reset:2
+    };
+
     tabs[map[name]].classList.add('active');
 }
 
-/* ─────────────────────────────
-   ROLE SWITCHER
-───────────────────────────── */
+/* ROLE */
+
 function setRole(panel, role, btn) {
 
     if (panel === 'login') {
@@ -30,8 +379,8 @@ function setRole(panel, role, btn) {
     }
 
     btn.closest('.role-row')
-       .querySelectorAll('.role-btn')
-       .forEach(b => b.classList.remove('active'));
+        .querySelectorAll('.role-btn')
+        .forEach(b => b.classList.remove('active'));
 
     btn.classList.add('active');
 
@@ -39,41 +388,36 @@ function setRole(panel, role, btn) {
 
         const isLawyer = role === 'lawyer';
 
-        document.querySelectorAll('.lawyer-field').forEach(el => {
-            el.style.display = isLawyer ? 'block' : 'none';
-        });
-
-        document.getElementById('reg-oab').required = isLawyer;
-        document.getElementById('reg-seccional').required = isLawyer;
+        document.querySelectorAll('.lawyer-field')
+            .forEach(el => {
+                el.style.display = isLawyer ? 'block' : 'none';
+            });
     }
 }
 
-/* ─────────────────────────────
-   PASSWORD TOGGLE
-───────────────────────────── */
-function togglePwd(id, btn) {
+/* TOAST */
 
-    const input = document.getElementById(id);
-    const icon  = btn.querySelector('i');
+function toast(msg) {
 
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
-    }
+    const el = document.getElementById('toast');
+
+    document.getElementById('toast-msg').textContent = msg;
+
+    el.classList.add('show');
+
+    setTimeout(() => {
+        el.classList.remove('show');
+    }, 4000);
 }
 
-/* ─────────────────────────────
-   SAFE ERROR PARSER
-───────────────────────────── */
+/* ERROR PARSER */
+
 function parseError(error) {
 
-    console.error("BACKEND ERROR:", error);
+    console.error(error);
 
     if (!error) {
-        return "Erro desconhecido.";
+        return "Erro desconhecido";
     }
 
     if (typeof error === "string") {
@@ -101,64 +445,21 @@ function parseError(error) {
         return error.message;
     }
 
-    return JSON.stringify(error, null, 2);
+    return JSON.stringify(error);
 }
 
-/* ─────────────────────────────
-   TOAST
-───────────────────────────── */
-function toast(msg, type = '') {
+/* LOGIN */
 
-    const el = document.getElementById('toast');
-    const icon = el.querySelector('i');
-    const span = document.getElementById('toast-msg');
-
-    span.textContent = msg;
-
-    el.className = `toast show ${type}`;
-
-    icon.className =
-        type === 'success'
-            ? 'fas fa-check-circle'
-            : type === 'error'
-                ? 'fas fa-exclamation-circle'
-                : 'fas fa-circle-info';
-
-    clearTimeout(el._timer);
-
-    el._timer = setTimeout(() => {
-        el.classList.remove('show');
-    }, 4500);
-}
-
-/* ─────────────────────────────
-   BUTTON STATE
-───────────────────────────── */
-function btnLoad(id, loading, label, icon) {
-
-    const btn = document.getElementById(id);
-
-    btn.disabled = loading;
-
-    btn.innerHTML = loading
-        ? `<i class="fas fa-spinner fa-spin"></i> Aguarde...`
-        : `<i class="${icon}"></i> ${label}`;
-}
-
-/* ─────────────────────────────
-   LOGIN
-───────────────────────────── */
 async function handleLogin() {
 
-    const email    = document.getElementById('login-email').value.trim();
+    const email = document.getElementById('login-email').value.trim();
+
     const password = document.getElementById('login-senha').value;
 
     if (!email || !password) {
-        toast('Preencha todos os campos.', 'error');
+        toast("Preencha todos os campos");
         return;
     }
-
-    btnLoad('btn-login', true);
 
     try {
 
@@ -168,77 +469,47 @@ async function handleLogin() {
             role: loginRole
         };
 
-        console.log("LOGIN PAYLOAD:", payload);
+        console.log(payload);
 
         const res = await fetch(`${API}/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
             },
-            body: JSON.stringify(payload)
+            body:JSON.stringify(payload)
         });
 
-        let data = {};
+        const data = await res.json();
 
-        try {
-            data = await res.json();
-        } catch (e) {
-            console.error("JSON LOGIN ERROR:", e);
-        }
-
-        console.log("LOGIN STATUS:", res.status);
-        console.log("LOGIN RESPONSE:", data);
+        console.log(data);
 
         if (!res.ok) {
-            toast(parseError(data), 'error');
+            toast(parseError(data));
             return;
         }
 
-        if (data.access_token) {
-            localStorage.setItem('jurisai_token', data.access_token);
-        }
-
-        document.getElementById('login-form').style.display = 'none';
-
-        document.getElementById('login-success-msg').textContent =
-            'Bem-vindo de volta!';
-
-        document.getElementById('login-success').classList.add('show');
-
-        toast('Login realizado com sucesso!', 'success');
+        toast("Login realizado!");
 
     } catch (err) {
 
         console.error(err);
 
-        toast('Erro de conexão com servidor.', 'error');
-
+        toast("Erro de conexão");
     }
-
-    btnLoad(
-        'btn-login',
-        false,
-        'Entrar na plataforma',
-        'fas fa-arrow-right-to-bracket'
-    );
 }
 
-/* ─────────────────────────────
-   REGISTER
-───────────────────────────── */
+/* REGISTER */
+
 async function handleRegister() {
 
-    const name     = document.getElementById('reg-nome').value.trim();
-    const email    = document.getElementById('reg-email').value.trim();
+    const name = document.getElementById('reg-nome').value.trim();
+
+    const email = document.getElementById('reg-email').value.trim();
+
     const password = document.getElementById('reg-senha').value;
 
     if (!name || !email || !password) {
-        toast('Preencha nome, e-mail e senha.', 'error');
-        return;
-    }
-
-    if (password.length < 8) {
-        toast('A senha deve ter ao menos 8 caracteres.', 'error');
+        toast("Preencha todos os campos");
         return;
     }
 
@@ -251,16 +522,12 @@ async function handleRegister() {
 
     if (regRole === 'lawyer') {
 
-        const oab = document.getElementById('reg-oab').value.trim();
-        const sec = document.getElementById('reg-seccional').value;
+        payload.oab_number =
+            document.getElementById('reg-oab').value.trim();
 
-        if (!oab || !sec) {
-            toast('Informe OAB e seccional.', 'error');
-            return;
-        }
+        payload.oab_seccional =
+            document.getElementById('reg-seccional').value;
 
-        payload.oab_number = oab;
-        payload.oab_seccional = sec;
         payload.especializacao =
             document.getElementById('reg-spec').value.trim();
 
@@ -268,127 +535,75 @@ async function handleRegister() {
             parseInt(document.getElementById('reg-exp').value) || 0;
     }
 
-    console.log("REGISTER PAYLOAD:", payload);
-
-    btnLoad('btn-register', true);
+    console.log("REGISTER:", payload);
 
     try {
 
         const res = await fetch(`${API}/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
             },
-            body: JSON.stringify(payload)
+            body:JSON.stringify(payload)
         });
 
         let data = {};
 
         try {
             data = await res.json();
-        } catch (e) {
-            console.error("REGISTER JSON ERROR:", e);
-        }
+        } catch {}
 
-        console.log("REGISTER STATUS:", res.status);
-        console.log("REGISTER RESPONSE:", data);
+        console.log(data);
 
         if (!res.ok) {
-            toast(parseError(data), 'error');
+            toast(parseError(data));
             return;
         }
 
-        document.getElementById('reg-form').style.display = 'none';
-
-        document.getElementById('reg-success-msg').textContent =
-            `Conta criada para ${email}`;
-
-        document.getElementById('reg-success').classList.add('show');
-
-        toast('Conta criada com sucesso!', 'success');
+        toast("Conta criada com sucesso!");
 
     } catch (err) {
 
         console.error(err);
 
-        toast('Erro de conexão com servidor.', 'error');
+        toast("Erro de conexão");
     }
-
-    btnLoad(
-        'btn-register',
-        false,
-        'Criar conta',
-        'fas fa-user-plus'
-    );
 }
 
-/* ─────────────────────────────
-   RESET
-───────────────────────────── */
+/* RESET */
+
 async function handleReset() {
 
-    const email = document.getElementById('reset-email').value.trim();
+    const email =
+        document.getElementById('reset-email').value.trim();
 
     if (!email) {
-        toast('Informe seu e-mail.', 'error');
+        toast("Informe seu e-mail");
         return;
     }
-
-    btnLoad('btn-reset', true);
 
     try {
 
         await fetch(`${API}/forgot-password`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
             },
-            body: JSON.stringify({ email })
+            body:JSON.stringify({ email })
         });
 
-        document.getElementById('reset-form').style.display = 'none';
-
-        document.getElementById('reset-success-msg').textContent =
-            `Se ${email} existir, enviaremos o link.`;
-
-        document.getElementById('reset-success').classList.add('show');
-
-        toast('Verifique sua caixa de entrada.', 'success');
+        toast("Verifique sua caixa de entrada");
 
     } catch (err) {
 
         console.error(err);
 
-        toast('Erro de conexão.', 'error');
+        toast("Erro de conexão");
     }
-
-    btnLoad(
-        'btn-reset',
-        false,
-        'Enviar link de recuperação',
-        'fas fa-paper-plane'
-    );
 }
 
-/* ─────────────────────────────
-   ENTER KEY
-───────────────────────────── */
-document.addEventListener('keydown', e => {
-
-    if (e.key !== 'Enter') return;
-
-    const active = document.querySelector('.panel.active').id;
-
-    if (active === 'panel-login') {
-        handleLogin();
-    }
-
-    if (active === 'panel-register') {
-        handleRegister();
-    }
-
-    if (active === 'panel-reset') {
-        handleReset();
-    }
-});
 </script>
+
+</body>
+</html>
+
