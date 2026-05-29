@@ -1,340 +1,492 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JurisAI – Plataforma de Advocacia Inteligente</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<title>JurisAI — Plataforma Jurídica</title>
 
-    <style>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
-        :root {
-            --bg: #06080c;
-            --surface: #0e1118;
-            --surface2: #151b26;
-            --surface3: #1c2535;
-            --gold: #c9a84c;
-            --gold2: #e8c97a;
-            --gold-dim: rgba(201,168,76,0.12);
-            --gold-glow: rgba(201,168,76,0.25);
-            --text: #edf2f7;
-            --text2: #a0aec0;
-            --text3: #5a6478;
-            --border: rgba(255,255,255,0.07);
-            --border-gold: rgba(201,168,76,0.3);
-            --danger: #e05252;
-            --success: #4caf82;
-            --r: 14px;
-            --r-sm: 8px;
-            --shadow: 0 20px 60px rgba(0,0,0,0.7);
-        }
+<style>
 
-        * {
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
+:root{
+    --bg:#05070c;
+    --card:#0d121b;
+    --card2:#121927;
+    --gold:#c8a646;
+    --gold2:#f0d27a;
+    --text:#f5f7fb;
+    --muted:#98a2b3;
+    --border:rgba(255,255,255,.06);
+    --danger:#ff5b5b;
+    --success:#4ade80;
+}
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        .wrapper {
-            width:100%;
-            max-width:480px;
-            padding:1rem;
-        }
+body{
+    background:
+        radial-gradient(circle at top,
+        rgba(200,166,70,.12),
+        transparent 30%),
+        var(--bg);
 
-        .card {
-            background: var(--surface);
-            border:1px solid var(--border);
-            border-radius:var(--r);
-            overflow:hidden;
-        }
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
 
-        .nav-tabs {
-            display:flex;
-            border-bottom:1px solid var(--border);
-        }
+.container{
+    width:100%;
+    max-width:460px;
+}
 
-        .nav-tab {
-            flex:1;
-            background:none;
-            border:none;
-            color:var(--text3);
-            padding:1rem;
-            cursor:pointer;
-            font-weight:bold;
-        }
+.card{
+    background:rgba(13,18,27,.96);
+    border:1px solid var(--border);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+    backdrop-filter:blur(8px);
+}
 
-        .nav-tab.active {
-            color:var(--gold);
-            border-bottom:2px solid var(--gold);
-        }
+.tabs{
+    display:flex;
+    border-bottom:1px solid var(--border);
+}
 
-        .panel {
-            display:none;
-            padding:2rem;
-        }
+.tab{
+    flex:1;
+    background:none;
+    border:none;
+    color:var(--muted);
+    padding:20px 10px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.25s;
+}
 
-        .panel.active {
-            display:block;
-        }
+.tab.active{
+    color:var(--gold2);
+    border-bottom:2px solid var(--gold);
+}
 
-        .role-row {
-            display:flex;
-            gap:.5rem;
-            margin-bottom:1.5rem;
-        }
+.panel{
+    display:none;
+    padding:32px;
+}
 
-        .role-btn {
-            flex:1;
-            border:none;
-            padding:.7rem;
-            cursor:pointer;
-            border-radius:8px;
-            background:var(--surface2);
-            color:var(--text2);
-        }
+.panel.active{
+    display:block;
+}
 
-        .role-btn.active {
-            background:var(--gold);
-            color:#000;
-        }
+.role-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:24px;
+}
 
-        .form-group {
-            margin-bottom:1rem;
-        }
+.role-btn{
+    flex:1;
+    border:none;
+    background:var(--card2);
+    color:var(--muted);
+    padding:14px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:.25s;
+}
 
-        .form-group label {
-            display:block;
-            margin-bottom:.4rem;
-            color:var(--text2);
-        }
+.role-btn.active{
+    background:var(--gold);
+    color:#111;
+    font-weight:bold;
+}
 
-        .field {
-            position:relative;
-        }
+.group{
+    margin-bottom:18px;
+}
 
-        .field input,
-        .field select {
-            width:100%;
-            background:var(--surface2);
-            border:1px solid var(--border);
-            color:white;
-            padding:.85rem;
-            border-radius:8px;
-        }
+.group label{
+    display:block;
+    margin-bottom:8px;
+    color:#d8dee9;
+}
 
-        .btn {
-            width:100%;
-            padding:.9rem;
-            border:none;
-            border-radius:8px;
-            cursor:pointer;
-            font-weight:bold;
-            margin-top:1rem;
-        }
+.input-wrap{
+    position:relative;
+}
 
-        .btn-gold {
-            background:var(--gold);
-            color:black;
-        }
+.input-wrap input,
+.input-wrap select{
+    width:100%;
+    background:var(--card2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:15px;
+    border-radius:12px;
+    outline:none;
+    transition:.2s;
+}
 
-        .lawyer-field {
-            display:none;
-        }
+.input-wrap input:focus,
+.input-wrap select:focus{
+    border-color:rgba(200,166,70,.6);
+    box-shadow:0 0 0 4px rgba(200,166,70,.08);
+}
 
-        .toast {
-            position:fixed;
-            bottom:20px;
-            left:50%;
-            transform:translateX(-50%);
-            background:#111;
-            color:#fff;
-            padding:1rem 1.5rem;
-            border-radius:10px;
-            display:none;
-            z-index:9999;
-        }
+.password-btn{
+    position:absolute;
+    top:50%;
+    right:14px;
+    transform:translateY(-50%);
+    background:none;
+    border:none;
+    color:var(--muted);
+    cursor:pointer;
+}
 
-        .toast.show {
-            display:block;
-        }
+.btn{
+    width:100%;
+    border:none;
+    padding:16px;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.25s;
+    margin-top:10px;
+}
 
-    </style>
+.btn-gold{
+    background:linear-gradient(
+        135deg,
+        var(--gold),
+        #9c7d29
+    );
+
+    color:#111;
+}
+
+.btn-gold:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.05);
+}
+
+.btn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
+.lawyer-field{
+    display:none;
+}
+
+.toast{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#121821;
+    border:1px solid var(--border);
+    color:white;
+    padding:16px 20px;
+    border-radius:14px;
+    display:none;
+    align-items:center;
+    gap:12px;
+    z-index:9999;
+    min-width:320px;
+    max-width:90%;
+    box-shadow:0 10px 40px rgba(0,0,0,.4);
+}
+
+.toast.show{
+    display:flex;
+}
+
+.toast.success{
+    border-color:rgba(74,222,128,.4);
+}
+
+.toast.error{
+    border-color:rgba(255,91,91,.4);
+}
+
+.toast i{
+    font-size:18px;
+}
+
+.success-box{
+    display:none;
+    text-align:center;
+    padding:20px;
+}
+
+.success-box.show{
+    display:block;
+}
+
+.success-box i{
+    font-size:42px;
+    color:var(--success);
+    margin-bottom:15px;
+}
+
+.small{
+    color:var(--muted);
+    font-size:14px;
+    margin-top:10px;
+    line-height:1.5;
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="wrapper">
+<div class="container">
 
-    <div class="card">
+<div class="card">
 
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showPanel('login')">
-                Entrar
-            </button>
+<div class="tabs">
 
-            <button class="nav-tab" onclick="showPanel('register')">
-                Cadastrar
-            </button>
+<button class="tab active"
+onclick="showPanel('login')">
+Entrar
+</button>
 
-            <button class="nav-tab" onclick="showPanel('reset')">
-                Recuperar
-            </button>
-        </div>
+<button class="tab"
+onclick="showPanel('register')">
+Cadastrar
+</button>
 
-        <!-- LOGIN -->
-        <div class="panel active" id="panel-login">
-
-            <div class="role-row">
-                <button class="role-btn active"
-                        onclick="setRole('login','client',this)">
-                    Cliente
-                </button>
-
-                <button class="role-btn"
-                        onclick="setRole('login','lawyer',this)">
-                    Advogado
-                </button>
-            </div>
-
-            <div class="form-group">
-                <label>E-mail</label>
-                <div class="field">
-                    <input type="email" id="login-email">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Senha</label>
-                <div class="field">
-                    <input type="password" id="login-senha">
-                </div>
-            </div>
-
-            <button class="btn btn-gold"
-                    id="btn-login"
-                    onclick="handleLogin()">
-                Entrar
-            </button>
-
-        </div>
-
-        <!-- REGISTER -->
-        <div class="panel" id="panel-register">
-
-            <div class="role-row">
-
-                <button class="role-btn active"
-                        onclick="setRole('reg','client',this)">
-                    Cliente
-                </button>
-
-                <button class="role-btn"
-                        onclick="setRole('reg','lawyer',this)">
-                    Advogado
-                </button>
-
-            </div>
-
-            <div class="form-group">
-                <label>Nome Completo</label>
-                <div class="field">
-                    <input type="text" id="reg-nome">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>E-mail</label>
-                <div class="field">
-                    <input type="email" id="reg-email">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Senha</label>
-                <div class="field">
-                    <input type="password" id="reg-senha">
-                </div>
-            </div>
-
-            <!-- Lawyer -->
-
-            <div class="lawyer-field form-group">
-                <label>OAB</label>
-                <div class="field">
-                    <input type="text" id="reg-oab">
-                </div>
-            </div>
-
-            <div class="lawyer-field form-group">
-                <label>Seccional</label>
-                <div class="field">
-                    <select id="reg-seccional">
-                        <option value="">Selecione</option>
-                        <option value="SP">SP</option>
-                        <option value="RJ">RJ</option>
-                        <option value="MG">MG</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="lawyer-field form-group">
-                <label>Especialização</label>
-                <div class="field">
-                    <input type="text" id="reg-spec">
-                </div>
-            </div>
-
-            <div class="lawyer-field form-group">
-                <label>Experiência</label>
-                <div class="field">
-                    <input type="number" id="reg-exp">
-                </div>
-            </div>
-
-            <button class="btn btn-gold"
-                    id="btn-register"
-                    onclick="handleRegister()">
-                Criar Conta
-            </button>
-
-        </div>
-
-        <!-- RESET -->
-        <div class="panel" id="panel-reset">
-
-            <div class="form-group">
-                <label>E-mail</label>
-
-                <div class="field">
-                    <input type="email" id="reset-email">
-                </div>
-            </div>
-
-            <button class="btn btn-gold"
-                    onclick="handleReset()">
-                Recuperar Senha
-            </button>
-
-        </div>
-
-    </div>
+<button class="tab"
+onclick="showPanel('reset')">
+Recuperar
+</button>
 
 </div>
 
+<!-- LOGIN -->
+<div class="panel active" id="panel-login">
+
+<div id="login-form">
+
+<div class="role-row">
+
+<button class="role-btn active"
+onclick="setRole('login','client',this)">
+Cliente
+</button>
+
+<button class="role-btn"
+onclick="setRole('login','lawyer',this)">
+Advogado
+</button>
+
+</div>
+
+<div class="group">
+<label>E-mail</label>
+
+<div class="input-wrap">
+<input type="email"
+id="login-email"
+placeholder="voce@email.com">
+</div>
+</div>
+
+<div class="group">
+<label>Senha</label>
+
+<div class="input-wrap">
+
+<input type="password"
+id="login-password"
+placeholder="********">
+
+<button class="password-btn"
+onclick="togglePassword('login-password',this)">
+<i class="fas fa-eye"></i>
+</button>
+
+</div>
+</div>
+
+<button class="btn btn-gold"
+id="btn-login"
+onclick="handleLogin()">
+<i class="fas fa-right-to-bracket"></i>
+Entrar
+</button>
+
+</div>
+
+<div class="success-box" id="login-success">
+<i class="fas fa-circle-check"></i>
+<h2>Login realizado</h2>
+<p class="small" id="login-success-msg"></p>
+</div>
+
+</div>
+
+<!-- REGISTER -->
+<div class="panel" id="panel-register">
+
+<div id="register-form">
+
+<div class="role-row">
+
+<button class="role-btn active"
+onclick="setRole('register','client',this)">
+Cliente
+</button>
+
+<button class="role-btn"
+onclick="setRole('register','lawyer',this)">
+Advogado
+</button>
+
+</div>
+
+<div class="group">
+<label>Nome Completo</label>
+
+<div class="input-wrap">
+<input type="text"
+id="reg-name"
+placeholder="Seu nome completo">
+</div>
+</div>
+
+<div class="group">
+<label>E-mail</label>
+
+<div class="input-wrap">
+<input type="email"
+id="reg-email"
+placeholder="voce@email.com">
+</div>
+</div>
+
+<div class="group">
+<label>Senha</label>
+
+<div class="input-wrap">
+
+<input type="password"
+id="reg-password"
+placeholder="Mínimo 8 caracteres">
+
+<button class="password-btn"
+onclick="togglePassword('reg-password',this)">
+<i class="fas fa-eye"></i>
+</button>
+
+</div>
+</div>
+
+<!-- LAWYER -->
+
+<div class="lawyer-field group">
+<label>Número OAB</label>
+
+<div class="input-wrap">
+<input type="text" id="reg-oab">
+</div>
+</div>
+
+<div class="lawyer-field group">
+<label>Seccional</label>
+
+<div class="input-wrap">
+
+<select id="reg-seccional">
+<option value="">Selecione</option>
+<option value="SP">SP</option>
+<option value="RJ">RJ</option>
+<option value="MG">MG</option>
+<option value="PR">PR</option>
+<option value="SC">SC</option>
+<option value="RS">RS</option>
+</select>
+
+</div>
+</div>
+
+<div class="lawyer-field group">
+<label>Especialização</label>
+
+<div class="input-wrap">
+<input type="text" id="reg-spec">
+</div>
+</div>
+
+<div class="lawyer-field group">
+<label>Anos de Experiência</label>
+
+<div class="input-wrap">
+<input type="number" id="reg-exp">
+</div>
+</div>
+
+<button class="btn btn-gold"
+id="btn-register"
+onclick="handleRegister()">
+<i class="fas fa-user-plus"></i>
+Criar Conta
+</button>
+
+</div>
+
+<div class="success-box" id="register-success">
+<i class="fas fa-circle-check"></i>
+<h2>Conta criada com sucesso</h2>
+<p class="small" id="register-success-msg"></p>
+</div>
+
+</div>
+
+<!-- RESET -->
+<div class="panel" id="panel-reset">
+
+<div class="group">
+<label>E-mail</label>
+
+<div class="input-wrap">
+<input type="email"
+id="reset-email"
+placeholder="voce@email.com">
+</div>
+</div>
+
+<button class="btn btn-gold"
+id="btn-reset"
+onclick="handleReset()">
+<i class="fas fa-paper-plane"></i>
+Enviar Recuperação
+</button>
+
+</div>
+
+</div>
+</div>
+
+<!-- TOAST -->
+
 <div class="toast" id="toast">
-    <span id="toast-msg"></span>
+<i class="fas fa-circle-info"></i>
+<span id="toast-message"></span>
 </div>
 
 <script>
@@ -342,22 +494,21 @@
 const API = "https://jurisai-backend-i0zq.onrender.com";
 
 let loginRole = "client";
-let regRole   = "client";
+let registerRole = "client";
 
-/* NAVIGATION */
+/* PANELS */
 
-function showPanel(name) {
+function showPanel(name){
 
     document.querySelectorAll('.panel')
-        .forEach(p => p.classList.remove('active'));
+    .forEach(el => el.classList.remove('active'));
 
-    document.querySelectorAll('.nav-tab')
-        .forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab')
+    .forEach(el => el.classList.remove('active'));
 
-    document.getElementById('panel-' + name)
-        .classList.add('active');
-
-    const tabs = document.querySelectorAll('.nav-tab');
+    document
+    .getElementById(`panel-${name}`)
+    .classList.add('active');
 
     const map = {
         login:0,
@@ -365,245 +516,470 @@ function showPanel(name) {
         reset:2
     };
 
-    tabs[map[name]].classList.add('active');
+    document
+    .querySelectorAll('.tab')[map[name]]
+    .classList.add('active');
 }
 
 /* ROLE */
 
-function setRole(panel, role, btn) {
+function setRole(type, role, btn){
 
-    if (panel === 'login') {
+    if(type === 'login'){
         loginRole = role;
-    } else {
-        regRole = role;
+    }else{
+        registerRole = role;
     }
 
     btn.closest('.role-row')
-        .querySelectorAll('.role-btn')
-        .forEach(b => b.classList.remove('active'));
+    .querySelectorAll('.role-btn')
+    .forEach(el => el.classList.remove('active'));
 
     btn.classList.add('active');
 
-    if (panel === 'reg') {
+    if(type === 'register'){
 
         const isLawyer = role === 'lawyer';
 
-        document.querySelectorAll('.lawyer-field')
-            .forEach(el => {
-                el.style.display = isLawyer ? 'block' : 'none';
-            });
+        document
+        .querySelectorAll('.lawyer-field')
+        .forEach(el => {
+            el.style.display =
+            isLawyer ? 'block' : 'none';
+        });
+    }
+}
+
+/* PASSWORD */
+
+function togglePassword(id, btn){
+
+    const input = document.getElementById(id);
+    const icon = btn.querySelector('i');
+
+    if(input.type === 'password'){
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    }else{
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
     }
 }
 
 /* TOAST */
 
-function toast(msg) {
+function toast(message, type=''){
 
-    const el = document.getElementById('toast');
+    const toastEl =
+    document.getElementById('toast');
 
-    document.getElementById('toast-msg').textContent = msg;
+    const msgEl =
+    document.getElementById('toast-message');
 
-    el.classList.add('show');
+    const icon =
+    toastEl.querySelector('i');
 
-    setTimeout(() => {
-        el.classList.remove('show');
-    }, 4000);
+    msgEl.textContent = message;
+
+    toastEl.className = `toast show ${type}`;
+
+    icon.className =
+    type === 'success'
+    ? 'fas fa-circle-check'
+    : type === 'error'
+    ? 'fas fa-circle-exclamation'
+    : 'fas fa-circle-info';
+
+    clearTimeout(toastEl.timer);
+
+    toastEl.timer = setTimeout(()=>{
+        toastEl.classList.remove('show');
+    },4500);
 }
 
 /* ERROR PARSER */
 
-function parseError(error) {
+function parseError(error){
 
-    console.error(error);
+    console.error("BACKEND ERROR:", error);
 
-    if (!error) {
+    if(!error){
         return "Erro desconhecido";
     }
 
-    if (typeof error === "string") {
+    if(typeof error === 'string'){
         return error;
     }
 
-    if (Array.isArray(error.detail)) {
+    if(Array.isArray(error.detail)){
 
-        return error.detail.map(e => {
+        return error.detail
+        .map(e => {
 
-            const field = e.loc
-                ? e.loc.join(" → ")
-                : "campo";
+            const field =
+            e.loc
+            ? e.loc.join(' → ')
+            : 'campo';
 
             return `${field}: ${e.msg}`;
-
-        }).join("\n");
+        })
+        .join('\n');
     }
 
-    if (typeof error.detail === "string") {
+    if(typeof error.detail === 'string'){
         return error.detail;
     }
 
-    if (typeof error.message === "string") {
+    if(typeof error.message === 'string'){
         return error.message;
     }
 
     return JSON.stringify(error);
 }
 
-/* LOGIN */
+/* BUTTON */
 
-async function handleLogin() {
+function setButtonLoading(
+    id,
+    loading,
+    text,
+    icon
+){
 
-    const email = document.getElementById('login-email').value.trim();
+    const btn =
+    document.getElementById(id);
 
-    const password = document.getElementById('login-senha').value;
+    btn.disabled = loading;
 
-    if (!email || !password) {
-        toast("Preencha todos os campos");
-        return;
-    }
-
-    try {
-
-        const payload = {
-            email,
-            password,
-            role: loginRole
-        };
-
-        console.log(payload);
-
-        const res = await fetch(`${API}/login`, {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        console.log(data);
-
-        if (!res.ok) {
-            toast(parseError(data));
-            return;
-        }
-
-        toast("Login realizado!");
-
-    } catch (err) {
-
-        console.error(err);
-
-        toast("Erro de conexão");
-    }
+    btn.innerHTML = loading
+    ? `<i class="fas fa-spinner fa-spin"></i> Aguarde...`
+    : `<i class="${icon}"></i> ${text}`;
 }
 
-/* REGISTER */
+/* LOGIN */
 
-async function handleRegister() {
+async function handleLogin(){
 
-    const name = document.getElementById('reg-nome').value.trim();
+    const email =
+    document
+    .getElementById('login-email')
+    .value
+    .trim();
 
-    const email = document.getElementById('reg-email').value.trim();
+    const password =
+    document
+    .getElementById('login-password')
+    .value;
 
-    const password = document.getElementById('reg-senha').value;
-
-    if (!name || !email || !password) {
-        toast("Preencha todos os campos");
+    if(!email || !password){
+        toast(
+            'Preencha todos os campos',
+            'error'
+        );
         return;
     }
 
     const payload = {
-        full_name: name,
         email,
         password,
-        role: regRole
+        role:loginRole
     };
 
-    if (regRole === 'lawyer') {
+    setButtonLoading(
+        'btn-login',
+        true,
+        'Entrar',
+        'fas fa-right-to-bracket'
+    );
 
-        payload.oab_number =
-            document.getElementById('reg-oab').value.trim();
+    try{
 
-        payload.oab_seccional =
-            document.getElementById('reg-seccional').value;
-
-        payload.especializacao =
-            document.getElementById('reg-spec').value.trim();
-
-        payload.experiencia =
-            parseInt(document.getElementById('reg-exp').value) || 0;
-    }
-
-    console.log("REGISTER:", payload);
-
-    try {
-
-        const res = await fetch(`${API}/register`, {
-            method:"POST",
+        const response =
+        await fetch(`${API}/login`,{
+            method:'POST',
             headers:{
-                "Content-Type":"application/json"
+                'Content-Type':'application/json'
             },
-            body:JSON.stringify(payload)
+            body:JSON.stringify({
+                payload:payload
+            })
         });
 
         let data = {};
 
-        try {
-            data = await res.json();
-        } catch {}
+        try{
+            data = await response.json();
+        }catch(e){}
 
         console.log(data);
 
-        if (!res.ok) {
-            toast(parseError(data));
+        if(!response.ok){
+            toast(
+                parseError(data),
+                'error'
+            );
             return;
         }
 
-        toast("Conta criada com sucesso!");
+        if(data.access_token){
+            localStorage.setItem(
+                'jurisai_token',
+                data.access_token
+            );
+        }
 
-    } catch (err) {
+        document
+        .getElementById('login-form')
+        .style.display = 'none';
+
+        document
+        .getElementById('login-success')
+        .classList.add('show');
+
+        document
+        .getElementById('login-success-msg')
+        .textContent =
+        'Bem-vindo à plataforma';
+
+        toast(
+            'Login realizado com sucesso',
+            'success'
+        );
+
+    }catch(err){
 
         console.error(err);
 
-        toast("Erro de conexão");
+        toast(
+            'Erro de conexão com servidor',
+            'error'
+        );
     }
+
+    setButtonLoading(
+        'btn-login',
+        false,
+        'Entrar',
+        'fas fa-right-to-bracket'
+    );
+}
+
+/* REGISTER */
+
+async function handleRegister(){
+
+    const full_name =
+    document
+    .getElementById('reg-name')
+    .value
+    .trim();
+
+    const email =
+    document
+    .getElementById('reg-email')
+    .value
+    .trim();
+
+    const password =
+    document
+    .getElementById('reg-password')
+    .value;
+
+    if(!full_name || !email || !password){
+
+        toast(
+            'Preencha todos os campos obrigatórios',
+            'error'
+        );
+
+        return;
+    }
+
+    if(password.length < 8){
+
+        toast(
+            'Senha deve ter mínimo 8 caracteres',
+            'error'
+        );
+
+        return;
+    }
+
+    const payload = {
+        full_name,
+        email,
+        password,
+        role:registerRole
+    };
+
+    if(registerRole === 'lawyer'){
+
+        payload.oab_number =
+        document
+        .getElementById('reg-oab')
+        .value
+        .trim();
+
+        payload.oab_seccional =
+        document
+        .getElementById('reg-seccional')
+        .value;
+
+        payload.especializacao =
+        document
+        .getElementById('reg-spec')
+        .value
+        .trim();
+
+        payload.experiencia =
+        parseInt(
+            document
+            .getElementById('reg-exp')
+            .value
+        ) || 0;
+    }
+
+    console.log(payload);
+
+    setButtonLoading(
+        'btn-register',
+        true,
+        'Criar Conta',
+        'fas fa-user-plus'
+    );
+
+    try{
+
+        const response =
+        await fetch(`${API}/register`,{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                payload:payload
+            })
+        });
+
+        let data = {};
+
+        try{
+            data = await response.json();
+        }catch(e){}
+
+        console.log(data);
+
+        if(!response.ok){
+
+            toast(
+                parseError(data),
+                'error'
+            );
+
+            return;
+        }
+
+        document
+        .getElementById('register-form')
+        .style.display = 'none';
+
+        document
+        .getElementById('register-success')
+        .classList.add('show');
+
+        document
+        .getElementById('register-success-msg')
+        .textContent =
+        `Conta criada para ${email}`;
+
+        toast(
+            'Conta criada com sucesso',
+            'success'
+        );
+
+    }catch(err){
+
+        console.error(err);
+
+        toast(
+            'Erro de conexão com servidor',
+            'error'
+        );
+    }
+
+    setButtonLoading(
+        'btn-register',
+        false,
+        'Criar Conta',
+        'fas fa-user-plus'
+    );
 }
 
 /* RESET */
 
-async function handleReset() {
+async function handleReset(){
 
     const email =
-        document.getElementById('reset-email').value.trim();
+    document
+    .getElementById('reset-email')
+    .value
+    .trim();
 
-    if (!email) {
-        toast("Informe seu e-mail");
+    if(!email){
+
+        toast(
+            'Informe seu e-mail',
+            'error'
+        );
+
         return;
     }
 
-    try {
+    setButtonLoading(
+        'btn-reset',
+        true,
+        'Enviar Recuperação',
+        'fas fa-paper-plane'
+    );
 
-        await fetch(`${API}/forgot-password`, {
-            method:"POST",
+    try{
+
+        await fetch(`${API}/forgot-password`,{
+            method:'POST',
             headers:{
-                "Content-Type":"application/json"
+                'Content-Type':'application/json'
             },
-            body:JSON.stringify({ email })
+            body:JSON.stringify({
+                payload:{
+                    email:email
+                }
+            })
         });
 
-        toast("Verifique sua caixa de entrada");
+        toast(
+            'Verifique sua caixa de entrada',
+            'success'
+        );
 
-    } catch (err) {
+    }catch(err){
 
         console.error(err);
 
-        toast("Erro de conexão");
+        toast(
+            'Erro de conexão com servidor',
+            'error'
+        );
     }
+
+    setButtonLoading(
+        'btn-reset',
+        false,
+        'Enviar Recuperação',
+        'fas fa-paper-plane'
+    );
 }
 
 </script>
 
 </body>
 </html>
-
