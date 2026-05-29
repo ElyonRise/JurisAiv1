@@ -1,495 +1,633 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JurisAI – Escritório de Advocacia Inteligente</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <style>
-        :root {
-            --bg-dark: #070a0e;
-            --bg-card: #12161f;
-            --bg-input: #1a202c;
-            --gold: #c9a84c;
-            --gold-hover: #e1c96b;
-            --text-light: #e6edf3;
-            --text-muted: #8b949e;
-            --radius: 12px;
-            --shadow: 0 8px 24px rgba(0,0,0,0.6);
-            --border: rgba(255, 255, 255, 0.08);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JurisAI – Escritório de Advocacia Inteligente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    :root {
+      --bg:      #09090f;
+      --bg2:     #0f0f1a;
+      --bg3:     #151525;
+      --gold:    #c9a84c;
+      --gold2:   #e8c96e;
+      --text:    #eee8d5;
+      --muted:   #7a7a99;
+      --border:  rgba(201,168,76,.18);
+      --radius:  14px;
+      --glow:    0 0 40px rgba(201,168,76,.12);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
 
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: var(--bg-dark);
-            color: var(--text-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        a { color: var(--gold); text-decoration:none; }
-        
-        /* Header */
-        header {
-            padding: 2.5rem 1rem;
-            text-align: center;
-            background: linear-gradient(180deg, #000, transparent);
-            border-bottom: 1px solid var(--border);
-        }
-        header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            background: linear-gradient(90deg, var(--gold), #fff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        header p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            margin-top: 0.3rem;
-        }
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content:'';
+      position:fixed; inset:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+      pointer-events:none; z-index:0;
+    }
 
-        /* Hero */
-        .hero {
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            min-height:70vh;
-            padding: 2rem 1rem;
-            position: relative;
-        }
-        .hero-content {
-            text-align:center;
-            max-width: 700px;
-        }
-        .hero h2 {
-            font-size: 3rem;
-            line-height: 1.2;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-        }
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2.5rem;
-            color: var(--text-muted);
-        }
-        
-        /* Buttons */
-        .cta-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--gold);
-            color: #000;
-            padding: 1rem 2.5rem;
-            font-weight: 700;
-            border-radius: var(--radius);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: none;
-            font-size: 1rem;
-        }
-        .cta-btn:hover {
-            background: var(--gold-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(201,168,76,0.4);
-        }
+    /* ── NAV ── */
+    nav {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.9rem 3rem;
+      background: rgba(9,9,15,.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family:'Playfair Display',serif;
+      font-size:1.5rem; font-weight:700;
+      background: linear-gradient(90deg,var(--gold),var(--gold2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      letter-spacing:.04em;
+    }
+    .nav-links { display:flex; gap:2rem; }
+    .nav-links a { color:var(--muted); font-size:.9rem; font-weight:500; transition:color .2s; text-decoration:none; }
+    .nav-links a:hover { color:var(--gold); }
+    .nav-cta {
+      background:var(--gold); color:#09090f;
+      padding:.5rem 1.4rem; border-radius:8px;
+      font-size:.88rem; font-weight:600;
+      text-decoration:none; transition:box-shadow .2s,transform .2s;
+    }
+    .nav-cta:hover { box-shadow:0 4px 18px rgba(201,168,76,.4); transform:translateY(-1px); }
 
-        /* Services Grid */
-        .services {
-            padding: 5rem 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            gap: 2rem;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        }
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 2.5rem 2rem;
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--gold);
-        }
-        .card i {
-            font-size: 2.5rem;
-            color: var(--gold);
-            margin-bottom: 1.5rem;
-        }
-        .card h3 {
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-        .card p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
+    /* ── HERO ── */
+    .hero {
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      text-align:center; padding:7rem 1.5rem 4rem;
+      position:relative;
+    }
+    .hero-bg {
+      position:absolute; inset:0; z-index:0;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,168,76,.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 20%, rgba(201,168,76,.05) 0%, transparent 60%);
+    }
+    .hero-inner { position:relative; z-index:1; max-width:720px; }
+    .hero-badge {
+      display:inline-block; margin-bottom:1.5rem;
+      background:rgba(201,168,76,.1); border:1px solid var(--border);
+      color:var(--gold); font-size:.78rem; font-weight:500; letter-spacing:.1em;
+      padding:.35rem 1rem; border-radius:20px; text-transform:uppercase;
+    }
+    .hero h1 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2.4rem,6vw,4rem); line-height:1.15;
+      margin-bottom:1.2rem; font-weight:700;
+    }
+    .hero h1 span {
+      background:linear-gradient(90deg,var(--gold),var(--gold2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero p { font-size:1.1rem; color:var(--muted); margin-bottom:2.5rem; line-height:1.75; }
+    .hero-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+    .btn-primary {
+      background:var(--gold); color:#09090f;
+      padding:.85rem 2.2rem; border-radius:var(--radius);
+      font-weight:600; font-size:.95rem; text-decoration:none;
+      transition:transform .2s,box-shadow .2s;
+    }
+    .btn-primary:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(201,168,76,.38); }
+    .btn-outline {
+      border:1px solid var(--border); color:var(--text);
+      padding:.85rem 2.2rem; border-radius:var(--radius);
+      font-weight:500; font-size:.95rem; text-decoration:none;
+      transition:border-color .2s,color .2s;
+    }
+    .btn-outline:hover { border-color:var(--gold); color:var(--gold); }
 
-        /* Modal System */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 1rem;
-        }
-        .modal-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 2.5rem;
-            border-radius: var(--radius);
-            width: 100%;
-            max-width: 500px;
-            box-shadow: var(--shadow);
-            position: relative;
-        }
-        .close-modal {
-            position: absolute;
-            top: 1.2rem; right: 1.2rem;
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .close-modal:hover { color: #fff; }
-        
-        .tab-group {
-            display: flex;
-            background: var(--bg-dark);
-            padding: 0.3rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border);
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 0.6rem;
-            text-align: center;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-        .tab-btn.active {
-            background: var(--gold);
-            color: #000;
-        }
+    /* ── STATS ── */
+    .stats {
+      display:flex; justify-content:center; flex-wrap:wrap; gap:3rem;
+      padding:3rem 1.5rem; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+      background:var(--bg2);
+    }
+    .stat { text-align:center; }
+    .stat-num { font-family:'Playfair Display',serif; font-size:2rem; color:var(--gold); font-weight:700; }
+    .stat-lbl { font-size:.82rem; color:var(--muted); margin-top:.3rem; letter-spacing:.06em; text-transform:uppercase; }
 
-        /* Form Controls */
-        .form-group {
-            margin-bottom: 1.2rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.4rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-light);
-        }
-        .form-control {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--gold);
-        }
-        
-        .advogado-only {
-            display: none;
-            border-left: 2px solid var(--gold);
-            padding-left: 1rem;
-            margin-top: 1rem;
-        }
+    /* ── SECTION TITLES ── */
+    .section { padding:6rem 1.5rem; }
+    .section-inner { max-width:1180px; margin:0 auto; }
+    .section-tag {
+      display:inline-block; color:var(--gold); font-size:.75rem; font-weight:600;
+      letter-spacing:.15em; text-transform:uppercase; margin-bottom:1rem;
+    }
+    .section-title {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1.8rem,4vw,2.6rem); line-height:1.25; margin-bottom:1rem; font-weight:700;
+    }
+    .section-sub { color:var(--muted); font-size:1rem; max-width:540px; line-height:1.75; }
 
-        .switch-auth {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        .switch-auth span { color: var(--gold); font-weight: 600; }
+    /* ── SERVICES GRID ── */
+    .services-grid {
+      display:grid; gap:1.2rem;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+      margin-top:3rem;
+    }
+    .svc-card {
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:var(--radius); padding:2rem;
+      transition:transform .3s,box-shadow .3s,border-color .3s;
+    }
+    .svc-card:hover { transform:translateY(-6px); box-shadow:var(--glow); border-color:rgba(201,168,76,.35); }
+    .svc-icon { width:48px; height:48px; border-radius:12px; background:rgba(201,168,76,.1);
+      display:flex; align-items:center; justify-content:center; margin-bottom:1.2rem; }
+    .svc-icon i { color:var(--gold); font-size:1.3rem; }
+    .svc-card h3 { font-size:1.1rem; margin-bottom:.6rem; font-weight:600; }
+    .svc-card p { color:var(--muted); font-size:.9rem; line-height:1.7; }
 
-        .notification {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            display: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-        .notification.success { background: rgba(37, 211, 102, 0.15); color: #25d366; border: 1px solid #25d366; }
-        .notification.error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+    /* ── REGISTER SECTION ── */
+    #cadastro {
+      background: var(--bg2);
+      border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    }
+    .register-wrap {
+      max-width:780px; margin:0 auto;
+    }
+    .register-header { text-align:center; margin-bottom:2.5rem; }
 
-        footer {
-            text-align: center;
-            padding: 3rem 1rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            border-top: 1px solid var(--border);
-        }
-    </style>
+    /* Tab switcher */
+    .type-tabs {
+      display:flex; gap:.8rem; justify-content:center; margin-bottom:2.5rem;
+    }
+    .type-tab {
+      flex:1; max-width:220px;
+      padding:1rem 1.5rem; border-radius:var(--radius);
+      border:1px solid var(--border); background:var(--bg3);
+      cursor:pointer; text-align:center; transition:all .25s; color:var(--muted);
+    }
+    .type-tab.active {
+      border-color:var(--gold); background:rgba(201,168,76,.08); color:var(--text);
+    }
+    .type-tab i { display:block; font-size:1.6rem; color:var(--gold); margin-bottom:.5rem; }
+    .type-tab span { font-size:.88rem; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+
+    /* Form */
+    .reg-form {
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:var(--radius); padding:2.5rem;
+    }
+    .form-row { display:grid; gap:1rem; grid-template-columns:1fr 1fr; }
+    .form-row.full { grid-template-columns:1fr; }
+    .field { display:flex; flex-direction:column; gap:.4rem; }
+    .field label { font-size:.82rem; font-weight:600; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; }
+    .field input, .field select {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:8px; padding:.75rem 1rem;
+      color:var(--text); font-family:'DM Sans',sans-serif; font-size:.92rem;
+      outline:none; transition:border-color .2s,box-shadow .2s;
+      appearance:none;
+    }
+    .field input:focus, .field select:focus {
+      border-color:var(--gold);
+      box-shadow:0 0 0 3px rgba(201,168,76,.12);
+    }
+    .field input::placeholder { color:var(--muted); }
+    .field select option { background:var(--bg2); }
+
+    /* lawyer-only fields */
+    .lawyer-only { display:none; }
+    .lawyer-only.show { display:contents; }
+
+    .form-divider {
+      border:none; border-top:1px solid var(--border); margin:1.5rem 0;
+    }
+    .form-check {
+      display:flex; align-items:flex-start; gap:.7rem;
+      font-size:.85rem; color:var(--muted); margin-top:1.2rem;
+    }
+    .form-check input[type=checkbox] { margin-top:.15rem; accent-color:var(--gold); }
+    .form-check a { color:var(--gold); }
+
+    .btn-submit {
+      width:100%; margin-top:1.5rem;
+      background:var(--gold); color:#09090f;
+      padding:1rem; border:none; border-radius:var(--radius);
+      font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600;
+      cursor:pointer; transition:transform .2s,box-shadow .2s;
+    }
+    .btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,168,76,.38); }
+
+    .login-link { text-align:center; margin-top:1.2rem; font-size:.88rem; color:var(--muted); }
+    .login-link a { color:var(--gold); font-weight:500; }
+
+    /* Success banner */
+    .success-banner {
+      display:none; text-align:center; padding:2rem;
+      background:rgba(39,174,96,.07); border:1px solid rgba(39,174,96,.25);
+      border-radius:var(--radius); margin-top:1.5rem;
+    }
+    .success-banner.show { display:block; }
+    .success-banner i { font-size:2.5rem; color:#27ae60; margin-bottom:.8rem; display:block; }
+    .success-banner h3 { margin-bottom:.5rem; }
+    .success-banner p { color:var(--muted); font-size:.92rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding:2.5rem 1.5rem; text-align:center;
+      border-top:1px solid var(--border); color:var(--muted);
+      font-size:.85rem; background:var(--bg);
+    }
+    footer .foot-logo {
+      font-family:'Playfair Display',serif; font-size:1.3rem;
+      background:linear-gradient(90deg,var(--gold),var(--gold2));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      margin-bottom:.8rem;
+    }
+    footer .foot-links { display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap; margin:.8rem 0; }
+    footer .foot-links a { color:var(--muted); text-decoration:none; transition:color .2s; }
+    footer .foot-links a:hover { color:var(--gold); }
+
+    /* WhatsApp */
+    .wa-float {
+      position:fixed; bottom:2rem; right:2rem; z-index:200;
+      width:54px; height:54px; border-radius:50%; background:#25d366;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.7rem; color:#fff; text-decoration:none;
+      box-shadow:0 4px 16px rgba(37,211,102,.4); transition:transform .2s,box-shadow .2s;
+    }
+    .wa-float:hover { transform:scale(1.1); box-shadow:0 6px 24px rgba(37,211,102,.5); }
+
+    /* ── TOAST ── */
+    .toast {
+      position:fixed; bottom:5rem; right:2rem; z-index:300;
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:10px; padding:.9rem 1.4rem; font-size:.9rem;
+      display:flex; align-items:center; gap:.7rem;
+      box-shadow:0 8px 30px rgba(0,0,0,.4);
+      transform:translateY(120%); opacity:0;
+      transition:transform .35s,opacity .35s;
+      max-width:320px;
+    }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.success { border-color:rgba(39,174,96,.4); }
+    .toast.success i { color:#27ae60; }
+    .toast.error { border-color:rgba(231,76,60,.4); }
+    .toast.error i { color:#e74c3c; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:640px) {
+      nav { padding:.8rem 1.2rem; }
+      .nav-links { display:none; }
+      .form-row { grid-template-columns:1fr; }
+      .reg-form { padding:1.5rem; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-    <h1>JurisAI</h1>
-    <p>Escritório de Advocacia Inteligente e Autônomo</p>
-</header>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">JurisAI</div>
+  <div class="nav-links">
+    <a href="#servicos">Serviços</a>
+    <a href="#cadastro">Cadastro</a>
+    <a href="http://localhost:8000/docs" target="_blank">API</a>
+  </div>
+  <a href="#cadastro" class="nav-cta">Criar Conta</a>
+</nav>
 
+<!-- HERO -->
 <section class="hero">
-    <div class="hero-content">
-        <h2>Sua Infraestrutura Jurídica Escalada por Inteligência Artificial</h2>
-        <p>Da triagem de petições automáticas ao gerenciamento avançado de casos. Acesse sua conta ou registre sua licença agora.</p>
-        <button class="cta-btn" onclick="openAuthModal('register')">
-            <i class="fas fa-layer-group"></i> Comece Agora Gratuitamente
-        </button>
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">✦ Plataforma Jurídica Inteligente</div>
+    <h1>Advocacia <span>eficiente</span><br>movida por IA</h1>
+    <p>Da triagem automática ao fechamento de contratos — conectamos clientes a advogados especializados com rapidez, segurança e tecnologia de ponta.</p>
+    <div class="hero-btns">
+      <a href="#cadastro" class="btn-primary">Criar conta grátis</a>
+      <a href="http://localhost:8000/docs" target="_blank" class="btn-outline">Ver a API <i class="fas fa-arrow-right" style="margin-left:.4rem;font-size:.8rem"></i></a>
     </div>
+  </div>
 </section>
 
-<section class="services">
-    <div class="card">
-        <i class="fas fa-robot"></i>
-        <h3>Triagem Automatizada</h3>
-        <p>Inteligência Artificial que analisa documentos, petições e classifica a urgência em segundos.</p>
-    </div>
-    <div class="card">
-        <i class="fas fa-file-signature"></i>
-        <h3>Contratos Avançados</h3>
-        <p>Geração dinâmica de minutas estruturadas e revisões automatizadas prontas em cliques.</p>
-    </div>
-    <div class="card">
-        <i class="fas fa-user-shield"></i>
-        <h3>Painel Unificado</h3>
-        <p>Área exclusiva para clientes e advogados gerenciarem prazos, logs e chats em tempo real.</p>
-    </div>
-</section>
-
-<div class="modal-overlay" id="authModal">
-    <div class="modal-box">
-        <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-        
-        <div class="tab-group">
-            <button class="tab-btn active" id="tabRegister" onclick="setMode('register')">Criar Conta</button>
-            <button class="tab-btn" id="tabLogin" onclick="setMode('login')">Acessar Painel</button>
-        </div>
-
-        <div id="modalNotice" class="notification"></div>
-
-        <form id="authForm" onsubmit="handleAuth(event)">
-            <div id="roleSelection" class="form-group">
-                <label>Eu sou:</label>
-                <select class="form-control" id="authRole" onchange="toggleRoleFields()">
-                    <option value="client">Cliente (Buscar suporte / Acompanhar Casos)</option>
-                    <option value="lawyer">Advogado (Gerenciar carteira / Usar IA)</option>
-                </select>
-            </div>
-
-            <div class="form-group" id="nameGroup">
-                <label>Nome Completo</label>
-                <input type="text" class="form-control" id="authName" placeholder="Seu nome">
-            </div>
-
-            <div class="form-group">
-                <label>E-mail Corporativo</label>
-                <input type="email" class="form-control" id="authEmail" required placeholder="nome@exemplo.com">
-            </div>
-
-            <div class="form-group">
-                <label>Senha de Acesso</label>
-                <input type="password" class="form-control" id="authPassword" required placeholder="••••••••">
-            </div>
-
-            <div class="advogado-only" id="lawyerFields">
-                <div class="form-group">
-                    <label>Inscrição OAB (Número/UF)</label>
-                    <input type="text" class="form-control" id="authOab" placeholder="Ex: 123456/SP">
-                </div>
-                <div class="form-group">
-                    <label>Especialidade Principal</label>
-                    <input type="text" class="form-control" id="authSpecialty" placeholder="Ex: Direito Civil, Tributário">
-                </div>
-                <div class="form-group">
-                    <label>Latitude Geográfica (Localidade)</label>
-                    <input type="number" step="any" class="form-control" id="authLat" value="-23.5505">
-                </div>
-                <div class="form-group">
-                    <label>Longitude Geográfica (Localidade)</label>
-                    <input type="number" step="any" class="form-control" id="authLng" value="-46.6333">
-                </div>
-            </div>
-
-            <button type="submit" class="cta-btn" style="width: 100%; justify-content: center; margin-top: 1rem;" id="submitBtn">
-                Confirmar Cadastro
-            </button>
-
-            <div class="switch-auth" id="switchText" onclick="toggleMode()">
-                Já possui uma conta? <span>Entrar agora</span>
-            </div>
-        </form>
-    </div>
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Gratuito para começar</div></div>
+  <div class="stat"><div class="stat-num">24h</div><div class="stat-lbl">Atendimento automatizado</div></div>
+  <div class="stat"><div class="stat-num">OAB</div><div class="stat-lbl">Verificação obrigatória</div></div>
+  <div class="stat"><div class="stat-num">SSL</div><div class="stat-lbl">Dados criptografados</div></div>
 </div>
 
+<!-- SERVICES -->
+<section class="section" id="servicos">
+  <div class="section-inner">
+    <div class="section-tag">✦ Recursos</div>
+    <h2 class="section-title">Tudo que seu escritório precisa</h2>
+    <p class="section-sub">Ferramentas desenvolvidas para modernizar a prática jurídica e maximizar resultados.</p>
+    <div class="services-grid">
+      <div class="svc-card">
+        <div class="svc-icon"><i class="fas fa-search"></i></div>
+        <h3>Triagem Inteligente</h3>
+        <p>Análise automática de documentos com classificação de urgência e relevância em segundos.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon"><i class="fas fa-file-contract"></i></div>
+        <h3>Contratos Rápidos</h3>
+        <p>Modelos adaptativos gerados por IA, revisáveis e prontos para assinar em poucos cliques.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon"><i class="fas fa-headset"></i></div>
+        <h3>Atendimento 24h</h3>
+        <p>Chatbot jurídico disponível a qualquer hora para dúvidas iniciais e agendamento de consultas.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon"><i class="fas fa-balance-scale"></i></div>
+        <h3>Dashboard Unificado</h3>
+        <p>Prazos, movimentações e documentos sincronizados em tempo real num único painel.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon"><i class="fas fa-user-tie"></i></div>
+        <h3>Match Advogado–Cliente</h3>
+        <p>Algoritmo que conecta clientes ao advogado mais adequado pela especialização e localidade.</p>
+      </div>
+      <div class="svc-card">
+        <div class="svc-icon"><i class="fas fa-shield-alt"></i></div>
+        <h3>Segurança & LGPD</h3>
+        <p>Dados criptografados, política de privacidade rigorosa e total conformidade com a LGPD.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTER SECTION -->
+<section class="section" id="cadastro">
+  <div class="register-wrap">
+    <div class="register-header">
+      <div class="section-tag">✦ Acesso</div>
+      <h2 class="section-title" style="text-align:center">Crie sua conta</h2>
+      <p class="section-sub" style="margin:0 auto;text-align:center">Escolha seu perfil e comece agora. Você receberá um e-mail para ativar sua conta.</p>
+    </div>
+
+    <!-- Type selector -->
+    <div class="type-tabs">
+      <div class="type-tab active" id="tab-cliente" onclick="setType('cliente')">
+        <i class="fas fa-user"></i>
+        <span>Cliente</span>
+      </div>
+      <div class="type-tab" id="tab-advogado" onclick="setType('advogado')">
+        <i class="fas fa-briefcase"></i>
+        <span>Advogado</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="reg-form" id="regForm">
+      <div class="form-row">
+        <div class="field">
+          <label>Nome completo</label>
+          <input type="text" id="f-nome" placeholder="João da Silva" />
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="f-email" placeholder="joao@email.com" />
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:1rem">
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="f-senha" placeholder="Mínimo 8 caracteres" />
+        </div>
+        <div class="field">
+          <label>Confirmar senha</label>
+          <input type="password" id="f-senha2" placeholder="Repita a senha" />
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:1rem">
+        <div class="field">
+          <label>Telefone</label>
+          <input type="tel" id="f-tel" placeholder="(47) 99999-9999" />
+        </div>
+        <div class="field">
+          <label>Estado (UF)</label>
+          <select id="f-estado">
+            <option value="">Selecione...</option>
+            <option>AC</option><option>AL</option><option>AM</option><option>AP</option>
+            <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+            <option>GO</option><option>MA</option><option>MG</option><option>MS</option>
+            <option>MT</option><option>PA</option><option>PB</option><option>PE</option>
+            <option>PI</option><option>PR</option><option>RJ</option><option>RN</option>
+            <option>RO</option><option>RR</option><option>RS</option><option>SC</option>
+            <option>SE</option><option>SP</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ADVOGADO ONLY -->
+      <hr class="form-divider lawyer-only" id="div-lawyer" />
+
+      <div class="form-row lawyer-only" id="oab-row" style="margin-top:0">
+        <div class="field">
+          <label>Número OAB</label>
+          <input type="text" id="f-oab" placeholder="Ex: 123456/SP" />
+        </div>
+        <div class="field">
+          <label>Seccional OAB</label>
+          <select id="f-seccional">
+            <option value="">Selecione o estado...</option>
+            <option>AC</option><option>AL</option><option>AM</option><option>AP</option>
+            <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+            <option>GO</option><option>MA</option><option>MG</option><option>MS</option>
+            <option>MT</option><option>PA</option><option>PB</option><option>PE</option>
+            <option>PI</option><option>PR</option><option>RJ</option><option>RN</option>
+            <option>RO</option><option>RR</option><option>RS</option><option>SC</option>
+            <option>SE</option><option>SP</option><option>TO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row lawyer-only" id="spec-row" style="margin-top:1rem">
+        <div class="field">
+          <label>Especialização principal</label>
+          <select id="f-spec">
+            <option value="">Selecione...</option>
+            <option>Direito Civil</option>
+            <option>Direito Trabalhista</option>
+            <option>Direito Penal</option>
+            <option>Direito de Família</option>
+            <option>Direito Tributário</option>
+            <option>Direito Empresarial</option>
+            <option>Direito do Consumidor</option>
+            <option>Direito Previdenciário</option>
+            <option>Direito Imobiliário</option>
+            <option>Direito Digital</option>
+            <option>Direito Ambiental</option>
+            <option>Direito Internacional</option>
+            <option>Direito Administrativo</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Anos de experiência</label>
+          <select id="f-exp">
+            <option value="">Selecione...</option>
+            <option>Menos de 1 ano</option>
+            <option>1 – 3 anos</option>
+            <option>4 – 7 anos</option>
+            <option>8 – 15 anos</option>
+            <option>Mais de 15 anos</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-check" style="margin-top:1.5rem">
+        <input type="checkbox" id="f-terms" />
+        <label for="f-terms">
+          Eu aceito os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> da JurisAI. Estou ciente de que receberei um e-mail para ativar minha conta.
+        </label>
+      </div>
+
+      <button class="btn-submit" id="btnSubmit" onclick="submitForm()">
+        <i class="fas fa-user-plus" style="margin-right:.5rem"></i>
+        Criar conta
+      </button>
+
+      <p class="login-link">Já tem conta? <a href="#">Faça login</a></p>
+    </div>
+
+    <!-- Success -->
+    <div class="success-banner" id="successBanner">
+      <i class="fas fa-check-circle"></i>
+      <h3>Conta criada com sucesso!</h3>
+      <p id="successMsg">Enviamos um link de ativação para o seu e-mail. Verifique sua caixa de entrada (e o spam).</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer>
-    © 2026 JurisAI – Todos os direitos reservados.
+  <div class="foot-logo">JurisAI</div>
+  <div class="foot-links">
+    <a href="#">Política de Privacidade</a>
+    <a href="#">Termos de Uso</a>
+    <a href="#">Contato</a>
+    <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+  </div>
+  <p>© 2025 JurisAI – Todos os direitos reservados.</p>
 </footer>
 
+<!-- WhatsApp -->
+<a href="https://wa.me/5547999999999" class="wa-float" target="_blank" rel="noopener">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="fas fa-info-circle" id="toastIcon"></i>
+  <span id="toastMsg"></span>
+</div>
+
 <script>
-    let currentMode = 'register';
-    const API_BASE = 'https://jurisai-backend.onrender.com';
+  // ── API base URL (mude para produção quando fizer deploy)
+  const API = 'http://localhost:8000';
 
-    function openAuthModal(mode) {
-        document.getElementById('authModal').style.display = 'flex';
-        setMode(mode);
+  let currentType = 'cliente';
+
+  function setType(type) {
+    currentType = type;
+    document.getElementById('tab-cliente').classList.toggle('active', type === 'cliente');
+    document.getElementById('tab-advogado').classList.toggle('active', type === 'advogado');
+    const lawyerEls = document.querySelectorAll('.lawyer-only');
+    lawyerEls.forEach(el => el.classList.toggle('show', type === 'advogado'));
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = 'toast ' + type;
+    icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  async function submitForm() {
+    const nome    = document.getElementById('f-nome').value.trim();
+    const email   = document.getElementById('f-email').value.trim();
+    const senha   = document.getElementById('f-senha').value;
+    const senha2  = document.getElementById('f-senha2').value;
+    const tel     = document.getElementById('f-tel').value.trim();
+    const estado  = document.getElementById('f-estado').value;
+    const terms   = document.getElementById('f-terms').checked;
+
+    if (!nome || !email || !senha || !estado) {
+      showToast('Preencha todos os campos obrigatórios.', 'error'); return;
+    }
+    if (senha !== senha2) {
+      showToast('As senhas não conferem.', 'error'); return;
+    }
+    if (senha.length < 8) {
+      showToast('A senha deve ter pelo menos 8 caracteres.', 'error'); return;
+    }
+    if (!terms) {
+      showToast('Aceite os Termos de Uso para continuar.', 'error'); return;
     }
 
-    function closeAuthModal() {
-        document.getElementById('authModal').style.display = 'none';
+    const payload = { nome, email, password: senha, telefone: tel, estado, role: currentType };
+
+    if (currentType === 'advogado') {
+      const oab   = document.getElementById('f-oab').value.trim();
+      const secc  = document.getElementById('f-seccional').value;
+      const spec  = document.getElementById('f-spec').value;
+      const exp   = document.getElementById('f-exp').value;
+      if (!oab || !secc || !spec) {
+        showToast('Preencha todos os campos do advogado.', 'error'); return;
+      }
+      payload.oab_numero   = oab;
+      payload.oab_seccional = secc;
+      payload.especializacao = spec;
+      payload.experiencia   = exp;
     }
 
-    function setMode(mode) {
-        currentMode = mode;
-        const notice = document.getElementById('modalNotice');
-        notice.style.display = 'none';
-        
-        if (mode === 'register') {
-            document.getElementById('tabRegister').classList.add('active');
-            document.getElementById('tabLogin').classList.remove('active');
-            document.getElementById('roleSelection').style.display = 'block';
-            document.getElementById('nameGroup').style.display = 'block';
-            document.getElementById('submitBtn').innerText = 'Criar Minha Conta';
-            document.getElementById('switchText').innerHTML = 'Já possui uma conta? <span>Entrar agora</span>';
-            toggleRoleFields();
-        } else {
-            document.getElementById('tabRegister').classList.remove('active');
-            document.getElementById('tabLogin').classList.add('active');
-            document.getElementById('roleSelection').style.display = 'none';
-            document.getElementById('nameGroup').style.display = 'none';
-            document.getElementById('lawyerFields').style.display = 'none';
-            document.getElementById('submitBtn').innerText = 'Entrar no Sistema';
-            document.getElementById('switchText').innerHTML = 'Não tem conta? <span>Cadastre-se aqui</span>';
-        }
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:.5rem"></i>Aguarde...';
+
+    try {
+      const res = await fetch(`${API}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById('regForm').style.display = 'none';
+        document.querySelector('.type-tabs').style.display = 'none';
+        const banner = document.getElementById('successBanner');
+        document.getElementById('successMsg').textContent =
+          `Enviamos um link de ativação para ${email}. Verifique sua caixa de entrada (e o spam).`;
+        banner.classList.add('show');
+        showToast('Conta criada! Verifique seu e-mail.', 'success');
+      } else {
+        showToast(data.detail || 'Erro ao criar conta.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus" style="margin-right:.5rem"></i>Criar conta';
+      }
+    } catch (err) {
+      showToast('Erro de conexão com o servidor.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-user-plus" style="margin-right:.5rem"></i>Criar conta';
     }
-
-    function toggleMode() {
-        setMode(currentMode === 'register' ? 'login' : 'register');
-    }
-
-    function toggleRoleFields() {
-        if(currentMode !== 'register') return;
-        const role = document.getElementById('authRole').value;
-        document.getElementById('lawyerFields').style.display = role === 'lawyer' ? 'block' : 'none';
-    }
-
-    async function handleAuth(e) {
-        e.preventDefault();
-        const notice = document.getElementById('modalNotice');
-        notice.style.display = 'none';
-
-        const email = document.getElementById('authEmail').value;
-        const password = document.getElementById('authPassword').value;
-
-        if (currentMode === 'register') {
-            const role = document.getElementById('authRole').value;
-            const fullName = document.getElementById('authName').value;
-            
-            // Corpo exato esperado pelo backend FastAPI do JurisAI
-            const payload = {
-                email: email,
-                password: password,
-                role: role,
-                full_name: fullName,
-                specialty: role === 'lawyer' ? document.getElementById('authSpecialty').value : "Cliente",
-                lat: role === 'lawyer' ? parseFloat(document.getElementById('authLat').value) : 0,
-                lng: role === 'lawyer' ? parseFloat(document.getElementById('authLng').value) : 0
-            };
-
-            try {
-                const response = await fetch(`${API_BASE}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    notice.className = "notification success";
-                    notice.innerHTML = "<i class='fas fa-envelope-open-text'></i> Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail corporativo. Por favor, valide sua caixa.";
-                    notice.style.display = 'block';
-                    setTimeout(() => setMode('login'), 4000);
-                } else {
-                    const errData = await response.json();
-                    throw new Error(errData.detail || "Erro ao efetuar registro.");
-                }
-            } catch (err) {
-                notice.className = "notification error";
-                notice.innerText = err.message;
-                notice.style.display = 'block';
-            }
-        } else {
-            // Fluxo de Login Real do Swagger
-            const payload = {
-                username: email,
-                password: password
-            };
-
-            try {
-                const response = await fetch(`${API_BASE}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    // Armazena as credenciais locais para o painel simular
-                    localStorage.setItem('userEmail', email);
-                    localStorage.setItem('userRole', email.includes('admin') || password === '12345' ? 'lawyer' : 'client');
-                    
-                    notice.className = "notification success";
-                    notice.innerText = "Autenticação aprovada! Redirecionando para o Dashboard...";
-                    notice.style.display = 'block';
-                    
-                    setTimeout(() => {
-                        window.location.href = '/frontend/dashboard.html';
-                    }, 1500);
-                } else {
-                    const errData = await response.json();
-                    // Fallback para visualização imediata se o backend travar na validação de ativação
-                    if(errData.detail === "Conta nao ativa.") {
-                        notice.className = "notification error";
-                        notice.innerHTML = "⚠️ <strong>Erro 403: Conta não ativada.</strong><br>Por favor, ative pelo e-mail ou utilize o login master para testes.";
-                        notice.style.display = 'block';
-                    } else {
-                        throw new Error(errData.detail || "Usuário ou senha incorretos.");
-                    }
-                }
-            } catch (err) {
-                notice.className = "notification error";
-                notice.innerText = err.message;
-                notice.style.display = 'block';
-            }
-        }
-    }
+  }
 </script>
 </body>
 </html>
