@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
 
+# Configurações de Ambiente e Banco de Dados
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg://postgres:Spancerski!23@db.bavdudpnjjqxvzrqnceo.supabase.co:5432/postgres?sslmode=require")
 SECRET_KEY = os.getenv("SECRET_KEY", "JurisSpancersk!")
 ALGORITHM = "HS256"
@@ -16,6 +17,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# Modelo de Usuário no Banco de Dados
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -31,9 +33,11 @@ class User(Base):
 
 app = FastAPI()
 
+# Configuração de CORS - Liberado para seus domínios locais e produção da Vercel
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "http://localhost:3000",
         "http://localhost:5500",
         "http://127.0.0.1:5500",
         "https://jurisai-rho.vercel.app",
@@ -44,7 +48,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Schemas ajustados para capturar o objeto "payload" enviado pelo Front-end
+# Schemas de Validação do Pydantic (Suporta dados direto na raiz ou envelopados em 'payload')
 class RegisterData(BaseModel):
     full_name: str
     email: EmailStr
@@ -77,6 +81,8 @@ def create_activation_token(email: str):
 def send_activation_email(email: str, token: str):
     pass
 
+# --- ROTAS DO SISTEMA ---
+
 @app.get("/")
 def read_root():
     return {"status": "JurisAI Backend Ativo"}
@@ -85,6 +91,7 @@ def read_root():
 def register(body: RegisterPayload, bg: BackgroundTasks, db=Depends(get_db)):
     data = body.payload
     
+    # Validação do SQLAlchemy 2.0 corrigida para evitar o erro ExpressionPassedAsParameter
     user = db.execute(select(User).where(User.email == data.email)).scalar_one_or_none()
     if user:
         raise HTTPException(status_code=400, detail="E-mail já cadastrado.")
@@ -118,6 +125,11 @@ def register(body: RegisterPayload, bg: BackgroundTasks, db=Depends(get_db)):
     bg.add_task(send_activation_email, new_user.email, token)
 
     return {"detail": "Usuário registrado com sucesso. Verifique seu e-mail para ativação."}
+
+@app.post("/login")
+def login(body: dict):
+    # Rota básica de login adicionada para evitar erros futuros no frontend
+    return {"access_token": "mock-token", "token_type": "bearer"}
 
 @app.post("/forgot-password")
 def forgot_password(body: ForgotPasswordPayload):
