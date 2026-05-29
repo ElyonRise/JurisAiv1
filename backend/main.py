@@ -34,15 +34,12 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "https://jurisai-rho.vercel.app"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://jurisai-rho.vercel.app",
+    "https://jurisai-jdlaa1jlm-elyonrises-projects.vercel.app",
+    "https://jurisai-git-main-elyonrises-projects.vercel.app",
+],
 class RegisterRequest(BaseModel):
     full_name: str
     email: EmailStr
