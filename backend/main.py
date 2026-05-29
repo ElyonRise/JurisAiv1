@@ -1,5 +1,7 @@
 import os
-import httpx
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
@@ -11,37 +13,39 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-SECRET_KEY = os.getenv("SECRET_KEY")
-RESEND_API_KEY = os.getenv("RESEND_API_KEY")
-ALGORITHM = "HS256"
+SECRET_KEY   = os.getenv("SECRET_KEY")
+MAIL_FROM    = os.getenv("MAIL_FROM")
+MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
+ALGORITHM    = "HS256"
 
-BACKEND_URL = "https://jurisaiv1.up.railway.app"
-FROM_EMAIL = "noreply@jurisai.example.com"
+BACKEND_URL  = "https://jurisaiv1.up.railway.app"
 FRONTEND_URL = "https://jurisai-rho.vercel.app"
 
 if not DATABASE_URL:
     raise RuntimeError("Variável DATABASE_URL não definida no ambiente.")
 if not SECRET_KEY:
     raise RuntimeError("Variável SECRET_KEY não definida no ambiente.")
-if not RESEND_API_KEY:
-    raise RuntimeError("Variável RESEND_API_KEY não definida no ambiente.")
+if not MAIL_FROM:
+    raise RuntimeError("Variável MAIL_FROM não definida no ambiente.")
+if not MAIL_PASSWORD:
+    raise RuntimeError("Variável MAIL_PASSWORD não definida no ambiente.")
 
-engine = create_engine(DATABASE_URL)
+engine       = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+Base         = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
+    id              = Column(Integer, primary_key=True, index=True)
+    full_name       = Column(String, nullable=False)
+    email           = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    role = Column(String, nullable=False)
-    oab_number = Column(String, unique=True, index=True, nullable=True)
-    oab_seccional = Column(String, nullable=True)
-    especializacao = Column(String, nullable=True)
-    experiencia = Column(Integer, nullable=True)
-    is_active = Column(Boolean, default=False)
+    role            = Column(String, nullable=False)
+    oab_number      = Column(String, unique=True, index=True, nullable=True)
+    oab_seccional   = Column(String, nullable=True)
+    especializacao  = Column(String, nullable=True)
+    experiencia     = Column(Integer, nullable=True)
+    is_active       = Column(Boolean, default=False)
 
 Base.metadata.create_all(bind=engine)
 
@@ -50,8 +54,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://jurisai-rho.vercel.app",
+        "https://jurisai-git-main-elyonrises-projects.vercel.app",
         "http://localhost:8080",
         "http://127.0.0.1:8080",
+        "http://localhost:3000",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -59,25 +67,25 @@ app.add_middleware(
 )
 
 class RegisterData(BaseModel):
-    full_name: str
-    email: EmailStr
-    password: str
-    role: str
-    oab_number: Optional[str] = None
-    oab_seccional: Optional[str] = None
+    full_name:      str
+    email:          EmailStr
+    password:       str
+    role:           str
+    oab_number:     Optional[str] = None
+    oab_seccional:  Optional[str] = None
     especializacao: Optional[str] = None
-    experiencia: Optional[int] = None
+    experiencia:    Optional[int] = None
 
 class RegisterPayload(BaseModel):
-    payload: Optional[RegisterData] = None
-    full_name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
-    role: Optional[str] = None
-    oab_number: Optional[str] = None
-    oab_seccional: Optional[str] = None
-    especializacao: Optional[str] = None
-    experiencia: Optional[int] = None
+    payload:        Optional[RegisterData] = None
+    full_name:      Optional[str]          = None
+    email:          Optional[EmailStr]     = None
+    password:       Optional[str]          = None
+    role:           Optional[str]          = None
+    oab_number:     Optional[str]          = None
+    oab_seccional:  Optional[str]          = None
+    especializacao: Optional[str]          = None
+    experiencia:    Optional[int]          = None
 
     def resolve(self) -> RegisterData:
         if self.payload:
@@ -96,13 +104,13 @@ class RegisterPayload(BaseModel):
         raise HTTPException(status_code=422, detail="Payload inválido.")
 
 class LoginData(BaseModel):
-    email: EmailStr
+    email:    EmailStr
     password: str
 
 class LoginPayload(BaseModel):
-    payload: Optional[LoginData] = None
-    email: Optional[EmailStr] = None
-    password: Optional[str] = None
+    payload:  Optional[LoginData] = None
+    email:    Optional[EmailStr]  = None
+    password: Optional[str]       = None
 
     def resolve(self) -> LoginData:
         if self.payload:
@@ -112,8 +120,8 @@ class LoginPayload(BaseModel):
         raise HTTPException(status_code=422, detail="Payload de login inválido.")
 
 class ForgotPasswordPayload(BaseModel):
-    payload: Optional[dict] = None
-    email: Optional[EmailStr] = None
+    payload: Optional[dict]     = None
+    email:   Optional[EmailStr] = None
 
     def resolve_email(self) -> str:
         if self.payload and "email" in self.payload:
@@ -129,8 +137,6 @@ def get_db():
     finally:
         db.close()
 
-
-
 def create_access_token(email: str, role: str) -> str:
     expire = datetime.utcnow() + timedelta(hours=8)
     return jwt.encode({"sub": email, "role": role, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
@@ -144,23 +150,45 @@ def create_reset_token(email: str) -> str:
     return jwt.encode({"sub": email, "type": "reset", "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
 def send_email(to: str, subject: str, html: str):
-    response = httpx.post(
-        "https://api.resend.com/emails",
-        headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
-        json={"from": FROM_EMAIL, "to": [to], "subject": subject, "html": html},
-        timeout=10,
-    )
-    if response.status_code not in (200, 201):
-        print(f"[RESEND ERROR] {response.status_code}: {response.text}")
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"]    = MAIL_FROM
+        msg["To"]      = to
+        msg.attach(MIMEText(html, "html"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(MAIL_FROM, MAIL_PASSWORD)
+            server.sendmail(MAIL_FROM, to, msg.as_string())
+        print(f"[EMAIL OK] Enviado para {to}")
+    except Exception as e:
+        print(f"[EMAIL ERROR] {e}")
 
 def send_activation_email(email: str, token: str):
     link = f"{BACKEND_URL}/activate?token={token}"
-    html = f"""<h2>Bem-vindo ao JurisAI!</h2><p>Clique no botão abaixo para ativar sua conta:</p><a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">Ativar minha conta</a><p>Este link expira em 24 horas.</p>"""
+    html = f"""
+    <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto">
+      <h2 style="color:#1a56db">Bem-vindo ao JurisAI!</h2>
+      <p>Clique no botão abaixo para ativar sua conta:</p>
+      <a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;margin:16px 0">
+        Ativar minha conta
+      </a>
+      <p style="color:#666;font-size:13px">Este link expira em 24 horas. Se você não criou uma conta, ignore este e-mail.</p>
+    </div>
+    """
     send_email(email, "Ative sua conta JurisAI", html)
 
 def send_reset_email(email: str, token: str):
     link = f"{FRONTEND_URL}/reset-password?token={token}"
-    html = f"""<h2>Redefinição de senha — JurisAI</h2><p>Clique no botão abaixo para redefinir sua senha:</p><a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;">Redefinir senha</a><p>Este link expira em 1 hora.</p>"""
+    html = f"""
+    <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto">
+      <h2 style="color:#1a56db">Redefinição de senha — JurisAI</h2>
+      <p>Clique no botão abaixo para redefinir sua senha:</p>
+      <a href="{link}" style="background:#1a56db;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;display:inline-block;margin:16px 0">
+        Redefinir senha
+      </a>
+      <p style="color:#666;font-size:13px">Este link expira em 1 hora. Se você não solicitou, ignore este e-mail.</p>
+    </div>
+    """
     send_email(email, "Redefinição de senha JurisAI", html)
 
 @app.get("/")
@@ -182,10 +210,10 @@ def register(body: RegisterPayload, bg: BackgroundTasks, db=Depends(get_db)):
         email=data.email,
         hashed_password=bcrypt.hashpw(data.password.encode(), bcrypt.gensalt()).decode(),
         role=data.role,
-        oab_number=data.oab_number if data.role == "lawyer" else None,
+        oab_number=data.oab_number      if data.role == "lawyer" else None,
         oab_seccional=data.oab_seccional if data.role == "lawyer" else None,
         especializacao=data.especializacao if data.role == "lawyer" else None,
-        experiencia=data.experiencia if data.role == "lawyer" else None,
+        experiencia=data.experiencia    if data.role == "lawyer" else None,
         is_active=False,
     )
     db.add(new_user)
@@ -199,15 +227,15 @@ def register(body: RegisterPayload, bg: BackgroundTasks, db=Depends(get_db)):
 def activate_account(token: str, db=Depends(get_db)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
-    except:
+        email   = payload.get("sub")
+    except Exception:
         raise HTTPException(status_code=400, detail="Token inválido ou expirado.")
     user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado.")
     user.is_active = True
     db.commit()
-    return {"detail": "Conta ativada com sucesso."}
+    return {"detail": "Conta ativada com sucesso. Você já pode fazer login."}
 
 @app.post("/login")
 def login(body: LoginPayload, db=Depends(get_db)):
@@ -220,15 +248,15 @@ def login(body: LoginPayload, db=Depends(get_db)):
     token = create_access_token(user.email, user.role)
     return {
         "access_token": token,
-        "token_type": "bearer",
-        "role": user.role,
-        "full_name": user.full_name,
+        "token_type":   "bearer",
+        "role":         user.role,
+        "full_name":    user.full_name,
     }
 
 @app.post("/forgot-password")
 def forgot_password(body: ForgotPasswordPayload, bg: BackgroundTasks, db=Depends(get_db)):
     email = body.resolve_email()
-    user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
+    user  = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
     if user and user.is_active:
         token = create_reset_token(email)
         bg.add_task(send_reset_email, email, token)
