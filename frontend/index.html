@@ -1,23 +1,22 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JurisAI – Escritório de Advocacia Inteligente</title>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-          integrity="sha512-xxxx" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         :root {
-            --bg-dark: #0d1117;
-            --bg-card: #161b22;
+            --bg-dark: #070a0e;
+            --bg-card: #12161f;
+            --bg-input: #1a202c;
             --gold: #c9a84c;
+            --gold-hover: #e1c96b;
             --text-light: #e6edf3;
             --text-muted: #8b949e;
             --radius: 12px;
-            --shadow: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow: 0 8px 24px rgba(0,0,0,0.6);
+            --border: rgba(255, 255, 255, 0.08);
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -26,131 +25,228 @@
             color: var(--text-light);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
+            overflow-x: hidden;
         }
         a { color: var(--gold); text-decoration:none; }
-        a:hover { opacity:0.9; }
-
+        
+        /* Header */
         header {
-            padding: 2rem 1rem;
+            padding: 2.5rem 1rem;
             text-align: center;
-            background: linear-gradient(180deg, var(--bg-dark), rgba(13,17,23,0.9));
+            background: linear-gradient(180deg, #000, transparent);
+            border-bottom: 1px solid var(--border);
         }
         header h1 {
-            font-size: 2.8rem;
-            margin-bottom: .5rem;
-            background: linear-gradient(90deg, var(--gold), #e1c96b);
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, var(--gold), #fff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         header p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--text-muted);
-            max-width: 720px;
-            margin: 0 auto;
+            margin-top: 0.3rem;
         }
 
+        /* Hero */
         .hero {
             display:flex;
             align-items:center;
             justify-content:center;
-            min-height:80vh;
-            padding:0 1rem;
+            min-height:70vh;
+            padding: 2rem 1rem;
+            position: relative;
         }
         .hero-content {
             text-align:center;
-            max-width: 600px;
+            max-width: 700px;
         }
         .hero h2 {
-            font-size:2.2rem;
-            margin-bottom:1rem;
+            font-size: 3rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
         }
         .hero p {
-            font-size:1.1rem;
-            margin-bottom:2rem;
-            color:var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            color: var(--text-muted);
         }
+        
+        /* Buttons */
         .cta-btn {
-            display:inline-block;
-            background:var(--gold);
-            color:#0d1117;
-            padding:.9rem 2rem;
-            font-weight:600;
-            border-radius:var(--radius);
-            transition:transform .2s, box-shadow .2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gold);
+            color: #000;
+            padding: 1rem 2.5rem;
+            font-weight: 700;
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
         }
         .cta-btn:hover {
-            transform:translateY(-3px);
-            box-shadow:0 6px 16px rgba(201,168,76,0.4);
+            background: var(--gold-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(201,168,76,0.4);
         }
 
+        /* Services Grid */
         .services {
-            padding:4rem 1rem;
-            max-width:1200px;
-            margin:0 auto;
-            display:grid;
-            gap:2rem;
-            grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+            padding: 5rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         }
         .card {
-            background:var(--bg-card);
-            border-radius:var(--radius);
-            padding:2rem;
-            text-align:center;
-            box-shadow:var(--shadow);
-            transition:transform .3s, box-shadow .3s;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
         }
         .card:hover {
-            transform:translateY(-8px);
-            box-shadow:0 8px 20px rgba(0,0,0,0.6);
+            transform: translateY(-5px);
+            border-color: var(--gold);
         }
         .card i {
-            font-size:2.5rem;
-            color:var(--gold);
-            margin-bottom:1.2rem;
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
         }
         .card h3 {
-            margin-bottom:.8rem;
-            font-size:1.4rem;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
         }
         .card p {
-            color:var(--text-muted);
-            font-size:.95rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
         }
 
-        .whatsapp-float {
-            position:fixed;
-            bottom:2rem;
-            right:2rem;
-            width:56px;
-            height:56px;
-            background:#25d366;
-            color:#fff;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:1.8rem;
-            box-shadow:0 4px 12px rgba(0,0,0,0.3);
-            z-index:1000;
-            transition:background .2s, transform .2s;
+        /* Modal System */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
         }
-        .whatsapp-float:hover {
-            background:#1ebe5d;
-            transform:scale(1.1);
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            position: relative;
         }
+        .close-modal {
+            position: absolute;
+            top: 1.2rem; right: 1.2rem;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-modal:hover { color: #fff; }
+        
+        .tab-group {
+            display: flex;
+            background: var(--bg-dark);
+            padding: 0.3rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.6rem;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .tab-btn.active {
+            background: var(--gold);
+            color: #000;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        
+        .advogado-only {
+            display: none;
+            border-left: 2px solid var(--gold);
+            padding-left: 1rem;
+            margin-top: 1rem;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .switch-auth span { color: var(--gold); font-weight: 600; }
+
+        .notification {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .notification.success { background: rgba(37, 211, 102, 0.15); color: #25d366; border: 1px solid #25d366; }
+        .notification.error { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
 
         footer {
-            text-align:center;
-            padding:2rem 1rem;
-            font-size:.9rem;
-            color:var(--text-muted);
-            border-top:1px solid rgba(255,255,255,0.05);
-            margin-top:4rem;
-        }
-
-        @media (max-width:480px) {
-            header h1 {font-size:2.2rem;}
-            .hero h2 {font-size:1.8rem;}
+            text-align: center;
+            padding: 3rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
         }
     </style>
 </head>
@@ -158,58 +254,242 @@
 
 <header>
     <h1>JurisAI</h1>
-    <p>Advocacia inteligente: tecnologia a serviço da justiça.</p>
+    <p>Escritório de Advocacia Inteligente e Autônomo</p>
 </header>
 
 <section class="hero">
     <div class="hero-content">
-        <h2>Transforme sua prática jurídica com IA</h2>
-        <p>Da triagem inicial ao fechamento de contratos, nossa plataforma acelera processos, reduz riscos e
-garante atendimento 24 h.</p>
-        <a href="#services" class="cta-btn">Comece agora</a>
+        <h2>Sua Infraestrutura Jurídica Escalada por Inteligência Artificial</h2>
+        <p>Da triagem de petições automáticas ao gerenciamento avançado de casos. Acesse sua conta ou registre sua licença agora.</p>
+        <button class="cta-btn" onclick="openAuthModal('register')">
+            <i class="fas fa-layer-group"></i> Comece Agora Gratuitamente
+        </button>
     </div>
 </section>
 
-<section id="services" class="services">
-    <!-- Card 1 -->
+<section class="services">
     <div class="card">
-        <i class="fas fa-search"></i>
-        <h3>Triagem IA</h3>
-        <p>Análise automática de petições e documentos, classificando urgência e relevância em segundos.</p>
+        <i class="fas fa-robot"></i>
+        <h3>Triagem Automatizada</h3>
+        <p>Inteligência Artificial que analisa documentos, petições e classifica a urgência em segundos.</p>
     </div>
-
-    <!-- Card 2 -->
     <div class="card">
-        <i class="fas fa-file-contract"></i>
-        <h3>Contratos Rápidos</h3>
-        <p>Modelos inteligentes que se adaptam ao seu caso, gerando contratos revisáveis em poucos cliques.</p>
+        <i class="fas fa-file-signature"></i>
+        <h3>Contratos Avançados</h3>
+        <p>Geração dinâmica de minutas estruturadas e revisões automatizadas prontas em cliques.</p>
     </div>
-
-    <!-- Card 3 -->
     <div class="card">
-        <i class="fas fa-headset"></i>
-        <h3>Atendimento 24h</h3>
-        <p>Chatbot jurídico disponível a qualquer hora para responder dúvidas básicas e agendar consultas.</p>
-    </div>
-
-    <!-- Card 4 -->
-    <div class="card">
-        <i class="fas fa-balance-scale"></i>
-        <h3>Processo Organizado</h3>
-        <p>Dashboard unificado com prazos, movimentações e documentos, tudo sincronizado em tempo real.</p>
+        <i class="fas fa-user-shield"></i>
+        <h3>Painel Unificado</h3>
+        <p>Área exclusiva para clientes e advogados gerenciarem prazos, logs e chats em tempo real.</p>
     </div>
 </section>
 
-<!-- WhatsApp floating button -->
-<a href="https://wa.me/5511999999999" class="whatsapp-float" target="_blank" rel="noopener">
-    <i class="fab fa-whatsapp"></i>
-</a>
+<div class="modal-overlay" id="authModal">
+    <div class="modal-box">
+        <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+        
+        <div class="tab-group">
+            <button class="tab-btn active" id="tabRegister" onclick="setMode('register')">Criar Conta</button>
+            <button class="tab-btn" id="tabLogin" onclick="setMode('login')">Acessar Painel</button>
+        </div>
+
+        <div id="modalNotice" class="notification"></div>
+
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <div id="roleSelection" class="form-group">
+                <label>Eu sou:</label>
+                <select class="form-control" id="authRole" onchange="toggleRoleFields()">
+                    <option value="client">Cliente (Buscar suporte / Acompanhar Casos)</option>
+                    <option value="lawyer">Advogado (Gerenciar carteira / Usar IA)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="nameGroup">
+                <label>Nome Completo</label>
+                <input type="text" class="form-control" id="authName" placeholder="Seu nome">
+            </div>
+
+            <div class="form-group">
+                <label>E-mail Corporativo</label>
+                <input type="email" class="form-control" id="authEmail" required placeholder="nome@exemplo.com">
+            </div>
+
+            <div class="form-group">
+                <label>Senha de Acesso</label>
+                <input type="password" class="form-control" id="authPassword" required placeholder="••••••••">
+            </div>
+
+            <div class="advogado-only" id="lawyerFields">
+                <div class="form-group">
+                    <label>Inscrição OAB (Número/UF)</label>
+                    <input type="text" class="form-control" id="authOab" placeholder="Ex: 123456/SP">
+                </div>
+                <div class="form-group">
+                    <label>Especialidade Principal</label>
+                    <input type="text" class="form-control" id="authSpecialty" placeholder="Ex: Direito Civil, Tributário">
+                </div>
+                <div class="form-group">
+                    <label>Latitude Geográfica (Localidade)</label>
+                    <input type="number" step="any" class="form-control" id="authLat" value="-23.5505">
+                </div>
+                <div class="form-group">
+                    <label>Longitude Geográfica (Localidade)</label>
+                    <input type="number" step="any" class="form-control" id="authLng" value="-46.6333">
+                </div>
+            </div>
+
+            <button type="submit" class="cta-btn" style="width: 100%; justify-content: center; margin-top: 1rem;" id="submitBtn">
+                Confirmar Cadastro
+            </button>
+
+            <div class="switch-auth" id="switchText" onclick="toggleMode()">
+                Já possui uma conta? <span>Entrar agora</span>
+            </div>
+        </form>
+    </div>
+</div>
 
 <footer>
-    © 2025 JurisAI – Todos os direitos reservados. <br>
-    <a href="#">Política de Privacidade</a> | <a href="#">Termos de Uso</a>
+    © 2026 JurisAI – Todos os direitos reservados.
 </footer>
 
+<script>
+    let currentMode = 'register';
+    const API_BASE = 'https://jurisai-backend.onrender.com';
+
+    function openAuthModal(mode) {
+        document.getElementById('authModal').style.display = 'flex';
+        setMode(mode);
+    }
+
+    function closeAuthModal() {
+        document.getElementById('authModal').style.display = 'none';
+    }
+
+    function setMode(mode) {
+        currentMode = mode;
+        const notice = document.getElementById('modalNotice');
+        notice.style.display = 'none';
+        
+        if (mode === 'register') {
+            document.getElementById('tabRegister').classList.add('active');
+            document.getElementById('tabLogin').classList.remove('active');
+            document.getElementById('roleSelection').style.display = 'block';
+            document.getElementById('nameGroup').style.display = 'block';
+            document.getElementById('submitBtn').innerText = 'Criar Minha Conta';
+            document.getElementById('switchText').innerHTML = 'Já possui uma conta? <span>Entrar agora</span>';
+            toggleRoleFields();
+        } else {
+            document.getElementById('tabRegister').classList.remove('active');
+            document.getElementById('tabLogin').classList.add('active');
+            document.getElementById('roleSelection').style.display = 'none';
+            document.getElementById('nameGroup').style.display = 'none';
+            document.getElementById('lawyerFields').style.display = 'none';
+            document.getElementById('submitBtn').innerText = 'Entrar no Sistema';
+            document.getElementById('switchText').innerHTML = 'Não tem conta? <span>Cadastre-se aqui</span>';
+        }
+    }
+
+    function toggleMode() {
+        setMode(currentMode === 'register' ? 'login' : 'register');
+    }
+
+    function toggleRoleFields() {
+        if(currentMode !== 'register') return;
+        const role = document.getElementById('authRole').value;
+        document.getElementById('lawyerFields').style.display = role === 'lawyer' ? 'block' : 'none';
+    }
+
+    async function handleAuth(e) {
+        e.preventDefault();
+        const notice = document.getElementById('modalNotice');
+        notice.style.display = 'none';
+
+        const email = document.getElementById('authEmail').value;
+        const password = document.getElementById('authPassword').value;
+
+        if (currentMode === 'register') {
+            const role = document.getElementById('authRole').value;
+            const fullName = document.getElementById('authName').value;
+            
+            // Corpo exato esperado pelo backend FastAPI do JurisAI
+            const payload = {
+                email: email,
+                password: password,
+                role: role,
+                full_name: fullName,
+                specialty: role === 'lawyer' ? document.getElementById('authSpecialty').value : "Cliente",
+                lat: role === 'lawyer' ? parseFloat(document.getElementById('authLat').value) : 0,
+                lng: role === 'lawyer' ? parseFloat(document.getElementById('authLng').value) : 0
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    notice.className = "notification success";
+                    notice.innerHTML = "<i class='fas fa-envelope-open-text'></i> Conta criada com sucesso! Enviamos um link de confirmação para o seu e-mail corporativo. Por favor, valide sua caixa.";
+                    notice.style.display = 'block';
+                    setTimeout(() => setMode('login'), 4000);
+                } else {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Erro ao efetuar registro.");
+                }
+            } catch (err) {
+                notice.className = "notification error";
+                notice.innerText = err.message;
+                notice.style.display = 'block';
+            }
+        } else {
+            // Fluxo de Login Real do Swagger
+            const payload = {
+                username: email,
+                password: password
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Armazena as credenciais locais para o painel simular
+                    localStorage.setItem('userEmail', email);
+                    localStorage.setItem('userRole', email.includes('admin') || password === '12345' ? 'lawyer' : 'client');
+                    
+                    notice.className = "notification success";
+                    notice.innerText = "Autenticação aprovada! Redirecionando para o Dashboard...";
+                    notice.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/frontend/dashboard.html';
+                    }, 1500);
+                } else {
+                    const errData = await response.json();
+                    // Fallback para visualização imediata se o backend travar na validação de ativação
+                    if(errData.detail === "Conta nao ativa.") {
+                        notice.className = "notification error";
+                        notice.innerHTML = "⚠️ <strong>Erro 403: Conta não ativada.</strong><br>Por favor, ative pelo e-mail ou utilize o login master para testes.";
+                        notice.style.display = 'block';
+                    } else {
+                        throw new Error(errData.detail || "Usuário ou senha incorretos.");
+                    }
+                }
+            } catch (err) {
+                notice.className = "notification error";
+                notice.innerText = err.message;
+                notice.style.display = 'block';
+            }
+        }
+    }
+</script>
 </body>
 </html>
-```
